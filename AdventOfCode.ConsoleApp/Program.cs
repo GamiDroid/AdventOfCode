@@ -4,10 +4,7 @@ App.SetProjectRootFolder();
 
 try
 {
-    var data = Day01_NotQuiteLisp.GetTestData();
-    var floor = Day01_NotQuiteLisp.GetFloorNumber(data);
-
-    Console.WriteLine("Floor is {0}", floor);
+    Day01_NotQuiteLisp.ExecutePart02();
 }
 catch (Exception ex)
 {

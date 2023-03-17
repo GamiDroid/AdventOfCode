@@ -23,4 +23,15 @@ public class NotQuiteLispTests
         // Assert
         Assert.Equal(expected, actual);
     }
+
+    [Theory]
+    [InlineData(")", 1)]
+    [InlineData("()())", 5)]
+    public void GetPositionFirstTimeBasement_ShouldReturnPosition(string input, int expected)
+    {
+        // Act
+        int actual = Day01_NotQuiteLisp.GetPositionFirstTimeBasement(input);
+        // Assert
+        Assert.Equal(expected, actual);
+    }
 }
