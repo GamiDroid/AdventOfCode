@@ -4,7 +4,7 @@ App.SetProjectRootFolder();
 
 try
 {
-    Day01_NotQuiteLisp.ExecutePart02();
+    Day02_IWasToldThereWouldBeNoMath.ExecutePart01();
 }
 catch (Exception ex)
 {
