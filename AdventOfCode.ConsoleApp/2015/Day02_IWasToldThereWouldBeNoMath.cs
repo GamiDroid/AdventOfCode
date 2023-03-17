@@ -15,7 +15,21 @@ internal class Day02_IWasToldThereWouldBeNoMath
         Console.WriteLine("Total paper needed: {0}", totalPaper);
     }
 
-    public static BoxDimentions[] GetTestData()
+    public static void ExecutePart02()
+    {
+        var dimentions = GetTestData();
+
+        var totalFeetRibbon = 0;
+        foreach (var box in dimentions)
+        {
+            var feetNeeded = GetFeetOfRibbon(box.Length, box.Width, box.Height);
+            totalFeetRibbon += feetNeeded;
+        }
+
+        Console.WriteLine("Total feet ribbon needed: {0}", totalFeetRibbon);
+    }
+
+    private static BoxDimentions[] GetTestData()
     {
         var rootFolder = App.ProjectRootFolder;
         var filePath = Path.Combine(rootFolder, "2015", "Resources", "IWasToldThereWouldBeNoMath.txt");
@@ -53,6 +67,20 @@ internal class Day02_IWasToldThereWouldBeNoMath
         var rest = o0 * o1;
 
         return squareFeetBox + rest;
+    }
+
+    public static int GetFeetOfRibbon(int l, int w, int h)
+    {
+        var list = new int[] { l, w, h };
+        var ordered = list.Order().ToArray();
+
+        var o0 = ordered[0];
+        var o1 = ordered[1];
+
+        var wrap = o0 * 2 + o1 * 2;
+        var bow = l * w * h;
+
+        return wrap + bow;
     }
 
     public record struct BoxDimentions(int Length, int Width, int Height);
