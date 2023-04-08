@@ -1,9 +1,18 @@
 ﻿namespace AdventOfCode.ConsoleApp._2015;
 internal class Day05_DoesntHeHaveInternElvesForThis
 {
-    public static void ExecutePart01()
+    private string[] _testData = default!;
+
+    [Setup]
+    public void Setup()
     {
-        var lines = GetTestData();
+        _testData = GetTestData();
+    }
+
+    [Part(1)]
+    public void ExecutePart01()
+    {
+        var lines = _testData;
 
         var counter = 0;
         foreach (var line in lines)
@@ -15,9 +24,10 @@ internal class Day05_DoesntHeHaveInternElvesForThis
         Console.WriteLine("Amount of nice strings: {0}", counter);
     }
 
-    public static void ExecutePart02()
+    [Part(2)]
+    public void ExecutePart02()
     {
-        var lines = GetTestData();
+        var lines = _testData;
 
         var counter = 0;
         foreach (var line in lines)

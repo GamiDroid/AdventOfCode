@@ -8,13 +8,15 @@ using System.Threading.Tasks;
 namespace AdventOfCode.ConsoleApp._2015;
 internal class Day04_TheIdealStockingStuffer
 {
-    public static void ExecutePart01()
+    [Part(1)]
+    public void ExecutePart01()
     {
         var anwser = FindNumberWhereMD5HashBeginsWith("bgvyzdsv", "00000");
         Console.WriteLine("The anwser is: {0}", anwser);
     }
 
-    public static void ExecutePart02()
+    [Part(2)]
+    public void ExecutePart02()
     {
         var anwser = FindNumberWhereMD5HashBeginsWith("bgvyzdsv", "000000");
         Console.WriteLine("The anwser is: {0}", anwser);

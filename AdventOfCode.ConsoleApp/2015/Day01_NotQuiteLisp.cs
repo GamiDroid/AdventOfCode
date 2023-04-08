@@ -1,17 +1,24 @@
 ﻿namespace AdventOfCode.ConsoleApp._2015;
-internal static class Day01_NotQuiteLisp
+internal class Day01_NotQuiteLisp
 {
-    public static void ExecutePart01()
+    private string _testData = string.Empty;
+
+    [Setup]
+    public void Setup() => _testData = GetTestData();
+
+    [Part(1)]
+    public void ExecutePart01()
     {
-        var data = GetTestData();
+        var data = _testData;
         var floor = GetFloorNumber(data);
 
         Console.WriteLine("Floor is {0}", floor);
     }
 
-    public static void ExecutePart02()
+    [Part(2)]
+    public void ExecutePart02()
     {
-        var data = GetTestData();
+        var data = _testData;
         var position = GetPositionFirstTimeBasement(data);
 
         Console.WriteLine("Position is {0}", position);

@@ -1,9 +1,15 @@
 ﻿namespace AdventOfCode.ConsoleApp._2015;
 internal class Day02_IWasToldThereWouldBeNoMath
 {
-    public static void ExecutePart01()
+    private BoxDimentions[] _testData = default!;
+
+    [Setup]
+    public void Setup() => _testData = GetTestData();
+
+    [Part(1)]
+    public void ExecutePart01()
     {
-        var dimentions = GetTestData();
+        var dimentions = _testData;
 
         var totalPaper = 0;
         foreach (var box in dimentions)
@@ -15,9 +21,10 @@ internal class Day02_IWasToldThereWouldBeNoMath
         Console.WriteLine("Total paper needed: {0}", totalPaper);
     }
 
-    public static void ExecutePart02()
+    [Part(2)]
+    public void ExecutePart02()
     {
-        var dimentions = GetTestData();
+        var dimentions = _testData;
 
         var totalFeetRibbon = 0;
         foreach (var box in dimentions)

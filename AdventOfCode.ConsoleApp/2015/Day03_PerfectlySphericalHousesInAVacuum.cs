@@ -3,23 +3,30 @@
 namespace AdventOfCode.ConsoleApp._2015;
 internal class Day03_PerfectlySphericalHousesInAVacuum
 {
-    public static void ExecutePart01()
+    private string _testData = string.Empty;
+
+    [Setup]
+    public void Setup() => _testData = GetTestData();
+
+    [Part(1)]
+    public void ExecutePart01()
     {
-        var input = GetTestData();
+        var input = _testData;
         var totalVisitedHouses = GetTotalVisitedHouses(input);
 
         Console.WriteLine("Total visited houses: {0}", totalVisitedHouses);
     }
 
-    public static void ExecutePart02()
+    [Part(2)]
+    public void ExecutePart02()
     {
-        var input = GetTestData();
+        var input = _testData;
         var totalVisitedHouses = GetTotalVisitedHousesWithRoboSanta(input);
 
         Console.WriteLine("Total visited houses: {0}", totalVisitedHouses);
     }
 
-    private static string GetTestData()
+    private string GetTestData()
     {
         var rootFolder = App.ProjectRootFolder;
         var filePath = Path.Combine(rootFolder, "2015", "Resources", "PerfectlySphericalHousesInAVacuum.txt");
