@@ -2,7 +2,7 @@ using AdventOfCode.ConsoleApp._2015;
 
 namespace AdventOfCode.Tests;
 
-public class NotQuiteLispTests
+public class Day01_NotQuiteLispTests
 {
     [Theory]
     [InlineData("(())", 0)]

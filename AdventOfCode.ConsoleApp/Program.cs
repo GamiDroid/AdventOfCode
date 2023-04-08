@@ -4,7 +4,7 @@ App.SetProjectRootFolder();
 
 try
 {
-    Day02_IWasToldThereWouldBeNoMath.ExecutePart02();
+    Day05_DoesntHeHaveInternElvesForThis.ExecutePart02();
 }
 catch (Exception ex)
 {

@@ -1,7 +1,7 @@
 ﻿using AdventOfCode.ConsoleApp._2015;
 
 namespace AdventOfCode.Tests;
-public class IWasToldThereWouldBeNoMath
+public class Day02_IWasToldThereWouldBeNoMathTests
 {
     [Theory]
     [InlineData(2, 3, 4, 58)]
