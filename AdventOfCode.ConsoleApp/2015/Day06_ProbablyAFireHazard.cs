@@ -32,6 +32,29 @@ public partial class Day06_ProbablyAFireHazard
         Console.WriteLine("Amount of lights lit: {0}", count);
     }
 
+    [Part(2)]
+    public void ExecutePart02()
+    {
+        var data = _testData;
+
+        var lights = new Lights();
+
+        foreach (var action in data)
+        {
+            switch (action.Command)
+            {
+                case "on": lights.TurnUp(action.FromX, action.FromY, action.ToX, action.ToY, 1); break;
+                case "off": lights.TurnDown(action.FromX, action.FromY, action.ToX, action.ToY); break;
+                case "toggle": lights.TurnUp(action.FromX, action.FromY, action.ToX, action.ToY, 2); break;
+                default: break;
+            }
+        }
+
+        var brightness = lights.CountBrightness();
+
+        Console.WriteLine("Brightness of the lights: {0}", brightness);
+    }
+
     private static Action[] GetTestData()
     {
         var rootFolder = App.ProjectRootFolder;
@@ -54,36 +77,58 @@ public partial class Day06_ProbablyAFireHazard
         public void TurnOn(int fromX, int fromY, int toX, int toY)
         {
             var lights = GetRange(fromX, fromY, toX, toY);
-            foreach (var light in lights)
-                _litLights.Add(light);
+            foreach (var (x, y) in lights)
+                _lights[x, y] = 1;
         }
 
         public void TurnOff(int fromX, int fromY, int toX, int toY)
         {
             var lights = GetRange(fromX, fromY, toX, toY);
-            foreach (var light in lights)
-                _litLights.Remove(light);
+            foreach (var (x, y) in lights)
+                _lights[x, y] = 0;
         }
 
         public void Toggle(int fromX, int fromY, int toX, int toY)
         {
             var lights = GetRange(fromX, fromY, toX, toY);
-            foreach (var light in lights)
+            foreach (var (x, y) in lights)
             {
-                if (_litLights.Contains(light))
-                {
-                    _litLights.Remove(light);
-                }
+                var lit = _lights[x, y];
+                if (lit == 0)
+                    _lights[x, y] = 1;
                 else
+                    _lights[x, y] = 0;
+            }
+        }
+
+        public void TurnUp(int fromX, int fromY, int toX, int toY, int increase)
+        {
+            var lights = GetRange(fromX, fromY, toX, toY);
+            foreach (var (x, y) in lights)
+            {
+                var brightness = _lights[x, y];
+                brightness += increase;
+                _lights[x, y] = brightness;
+            }
+        }
+
+        public void TurnDown(int fromX, int fromY, int toX, int toY)
+        {
+            var lights = GetRange(fromX, fromY, toX, toY);
+            foreach (var (x, y) in lights)
+            {
+                var brightness = _lights[x, y];
+                if (brightness > 0)
                 {
-                    _litLights.Add(light);
+                    brightness -= 1;
+                    _lights[x, y] = brightness;
                 }
             }
         }
 
-        private static IEnumerable<Light> GetRange(int fromX, int fromY, int toX, int toY)
+        private static IEnumerable<(int x, int y)> GetRange(int fromX, int fromY, int toX, int toY)
         {
-            var set = new HashSet<Light>();
+            var set = new HashSet<(int x, int y)>();
 
             var tempFromX = fromX < toX ? fromX : toX;
             var tempToX = fromX >= toX ? fromX : toX;
@@ -95,16 +140,46 @@ public partial class Day06_ProbablyAFireHazard
             {
                 for (int y = tempFromY; y <= tempToY; y++)
                 {
-                    set.Add(new Light(x, y));
+                    set.Add((x, y));
                 }
             }
 
             return set;
         }
 
-        public int CountLit() => _litLights.Count;
+        public int CountLit()
+        {
+            var count = 0;
+            for (int x = 0; x < c_maxX; x++)
+            {
+                for (int y = 0; y < c_maxY; y++)
+                {
+                    if (_lights[x, y] > 0)
+                        count++;
+                }
+            }
 
-        private readonly HashSet<Light> _litLights = new();
+            return count;
+        }
+
+        public int CountBrightness()
+        {
+            var count = 0;
+            for (int x = 0; x < c_maxX; x++)
+            {
+                for (int y = 0; y < c_maxY; y++)
+                {
+                    count += _lights[x, y];
+                }
+            }
+
+            return count;
+        }
+
+        private readonly int[,] _lights = new int[c_maxX, c_maxY];
+
+        private const int c_maxX = 1000;
+        private const int c_maxY = 1000;
     }
 
     public partial record struct Action(string Command, int FromX, int FromY, int ToX, int ToY)
@@ -126,6 +201,4 @@ public partial class Day06_ProbablyAFireHazard
         [GeneratedRegex("(?<command>\\w+) (?<fromx>\\d+),(?<fromy>\\d+) through (?<tox>\\d+),(?<toy>\\d+)")]
         private static partial Regex ActionRegex();
     }
-
-    public record struct Light(int X, int Y);
 }
