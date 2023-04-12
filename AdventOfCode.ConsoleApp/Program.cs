@@ -10,7 +10,8 @@ try
     //AdventOfCodeRunner.RunParts<Day03_PerfectlySphericalHousesInAVacuum>();
     //AdventOfCodeRunner.RunParts<Day04_TheIdealStockingStuffer>();
     //AdventOfCodeRunner.RunParts<Day05_DoesntHeHaveInternElvesForThis>();
-    AdventOfCodeRunner.RunParts<Day06_ProbablyAFireHazard>();
+    //AdventOfCodeRunner.RunParts<Day06_ProbablyAFireHazard>();
+    AdventOfCodeRunner.RunParts<Day07_SomeAssemblyRequired>();
 }
 catch (Exception ex)
 {
