@@ -13,8 +13,11 @@ internal class Day07_SomeAssemblyRequired
         var wires = new WireSet();
 
         foreach (var line in _testData)
-            wires.DoCommand(line);
-        Console.WriteLine($"wire a = '{wires["a"]}'");
+            wires.Connect(line);
+
+        var wireA = wires.GetSignal("a");
+
+        Console.WriteLine($"wire a = '{wireA}'");
     }
 
     private static string[] GetTestData()
@@ -26,107 +29,125 @@ internal class Day07_SomeAssemblyRequired
 
     public class WireSet
     {
-        public ushort this[string wire] 
+        public ushort GetSignal(string wire)
         {
-            get
+            if (!_connections.ContainsKey(wire))
+                throw new ArgumentException($"Wire '{wire}' does not exists", nameof(wire));
+
+            if (_outputs.TryGetValue(wire, out ushort cachedSignal))
             {
-                if (!_outputs.ContainsKey(wire))
-                    return 0;
-                return _outputs[wire];
+                Console.WriteLine($"Get cached signal for wire '{wire}' = '{cachedSignal}'.");
+                return cachedSignal;
             }
-            set
+
+            var source = _connections[wire];
+
+            if (source.Inputs.Any())
             {
-                _outputs[wire] = value;
+                Console.WriteLine("Source has inputs: " + string.Join(", ", source.Inputs));
             }
+
+            List<ushort> signals = new();
+            foreach (var input in source.Inputs)
+            {
+                var s = GetSignal(input);
+                signals.Add(s);
+            }
+
+            var signal = source.Type switch
+            {
+                SourceType.Constant => source.ConstantValue ?? 0,
+                SourceType.Wire => signals[0],
+                SourceType.NotGate => (ushort)~signals[0],
+                SourceType.LShiftGate => (ushort)(signals[0] << source.ConstantValue!.Value),
+                SourceType.RShiftGate => (ushort)(signals[0] >> source.ConstantValue!.Value),
+                SourceType.AndGate => (ushort)(signals[0] & signals[1]),
+                SourceType.OrGate => (ushort)(signals[0] | signals[1]),
+                _ => ushort.MinValue,
+            };
+
+            Console.WriteLine($"Signal for wire '{wire}' = '{signal}' with input type {source.Type}.");
+
+            return signal;
         }
 
-        public void DoCommand(string command)
+        public void Connect(string connection)
         {
-            var split = command.Split("->", StringSplitOptions.TrimEntries);
-            
-            var action = split[0];
-            var assign = split[1];
+            var split = connection.Split("->", StringSplitOptions.TrimEntries);
 
-            if (string.IsNullOrWhiteSpace(action) || string.IsNullOrWhiteSpace(assign))
-                throw new ArgumentException("Command is invalid format", nameof(command));
+            var source = split[0];
+            var target = split[1];
 
-            var current = this[assign];
-            var output = GetOutput(action);
+            if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(target))
+                throw new ArgumentException("Connection is invalid format", nameof(connection));
 
-            Console.WriteLine(command);
-            Console.WriteLine($"{assign}: {Convert.ToString(current, 2)} ({current}) -> {Convert.ToString(output, 2)} ({output})");
-
-            this[assign] = output;
+            var s = GetSource(source);
+            _connections[target] = s;
         }
 
-        public ushort GetOutput(string action)
+        private static Source GetSource(string source)
         {
-            if (action.Contains("NOT"))
-                return DoNotAction(action);
-            else if (action.Contains("LSHIFT"))
-                return DoShiftAction(action, 'L');
-            else if (action.Contains("RSHIFT"))
-                return DoShiftAction(action, 'R');
-            else if (action.Contains("OR"))
-                return DoOrAction(action);
-            else if (action.Contains("AND"))
-                return DoAndAction(action);
-            return GetAssign(action);
+            var sourceType = GetSourceType(source);
+
+            if (sourceType == SourceType.Constant)
+            {
+                var constantValue = ushort.Parse(source);
+                return new Source(sourceType, constantValue);
+            }
+
+            var split = source.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            switch (sourceType)
+            {
+                case SourceType.Wire:
+                    return new Source(sourceType, null, split[0]);
+                case SourceType.NotGate:
+                    return new Source(sourceType, null, split[1]);
+                case SourceType.LShiftGate:
+                case SourceType.RShiftGate:
+                    var constantValue = ushort.Parse(split[2]);
+                    return new Source(sourceType, constantValue, split[0]);
+                case SourceType.AndGate:
+                case SourceType.OrGate:
+                    return new Source(sourceType, null, split[0], split[2]);
+                default:
+                    break;
+            }
+
+            throw new ArgumentException("Source is invalid format", nameof(source));
         }
 
-        public string OutputString(string wire) => Convert.ToString(this[wire], toBase: 2);
-
-        private ushort DoNotAction(string action)
+        private static SourceType GetSourceType(string source)
         {
-            var wire = action.Split(' ')[1];
-            var output = (ushort)~this[wire];
-            return output;
+            if (source.Contains("NOT"))
+                return SourceType.NotGate;
+            else if (source.Contains("LSHIFT"))
+                return SourceType.LShiftGate;
+            else if (source.Contains("RSHIFT"))
+                return SourceType.RShiftGate;
+            else if (source.Contains("OR"))
+                return SourceType.OrGate;
+            else if (source.Contains("AND"))
+                return SourceType.AndGate;
+            if (ushort.TryParse(source, out var _))
+                return SourceType.Constant;
+            return SourceType.Wire;
         }
 
-        private ushort DoShiftAction(string action, char direction)
-        {
-            (var lhs, var rhs) = GetValues(action);
-
-            var wire = lhs;
-            var shiftConst = ushort.Parse(rhs);
-
-            ushort output;
-            var input = this[wire];
-            if (direction == 'L')
-                output = (ushort)(input << shiftConst);
-            else
-                output = (ushort)(input >> shiftConst);
-            return output;
-        }
-
-        private ushort DoAndAction(string action)
-        {
-            (var lhs, var rhs) = GetValues(action);
-
-            var output = (ushort)(this[lhs] & this[rhs]);
-            return output;
-        }
-
-        private ushort DoOrAction(string action)
-        {
-            (var lhs, var rhs) = GetValues(action);
-
-            var output = (ushort)(this[lhs] | this[rhs]);
-            return output;
-        }
-
-        private ushort GetAssign(string action) => ushort.TryParse(action, out ushort o) ? o : this[action];
-
-        private static (string lhs, string rhs) GetValues(string action)
-        {
-            var split = action.Split(' ');
-
-            if (split.Length != 3)
-                throw new ArgumentException("Action in invalid format", nameof(action));
-
-            return (split[0], split[2]);
-        }
-
+        private readonly IDictionary<string, Source> _connections = new Dictionary<string, Source>();
         private readonly IDictionary<string, ushort> _outputs = new Dictionary<string, ushort>();
+    }
+
+    public record Source(SourceType Type, ushort? ConstantValue, params string[] Inputs);
+
+    public enum SourceType 
+    { 
+        Constant = 1,
+        Wire = 2,
+        NotGate = 3,
+        LShiftGate = 4,
+        RShiftGate = 5,
+        AndGate = 6,
+        OrGate = 7,
     }
 }
