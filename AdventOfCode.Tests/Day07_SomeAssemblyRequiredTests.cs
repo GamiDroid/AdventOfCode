@@ -8,6 +8,8 @@ using static AdventOfCode.ConsoleApp._2015.Day07_SomeAssemblyRequired;
 namespace AdventOfCode.Tests;
 public class Day07_SomeAssemblyRequiredTests
 {
+
+
     [Fact]
     public void Example_ShouldHaveSameOutput()
     {
@@ -25,13 +27,13 @@ public class Day07_SomeAssemblyRequiredTests
         wires.Connect("NOT y -> i");
 
         // Assert
-        Assert.Equal(72, wires.GetSignal("d"));
-        Assert.Equal(507, wires.GetSignal("e"));
-        Assert.Equal(492, wires.GetSignal("f"));
-        Assert.Equal(114, wires.GetSignal("g"));
-        Assert.Equal(65412, wires.GetSignal("h"));
-        Assert.Equal(65079, wires.GetSignal("i"));
-        Assert.Equal(123, wires.GetSignal("x"));
-        Assert.Equal(456, wires.GetSignal("y"));
+        Assert.Equal(72, wires.Signal("d"));
+        Assert.Equal(507, wires.Signal("e"));
+        Assert.Equal(492, wires.Signal("f"));
+        Assert.Equal(114, wires.Signal("g"));
+        Assert.Equal(65412, wires.Signal("h"));
+        Assert.Equal(65079, wires.Signal("i"));
+        Assert.Equal(123, wires.Signal("x"));
+        Assert.Equal(456, wires.Signal("y"));
     }
 }
