@@ -45,8 +45,6 @@ internal class Day07_SomeAssemblyRequired
 
     public class WireSet
     {
-
-
         public void Connect(string connection)
         {
             var split = connection.Split("->", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -95,11 +93,8 @@ internal class Day07_SomeAssemblyRequired
         public void Clear() => _signals.Clear();
 
         private readonly Dictionary<string, Gate> _connections = new();
-        private readonly Signals _signals = new();
+        private readonly Dictionary<string, ushort> _signals = new();
     }
-
-    public class Signals : Dictionary<string, ushort> { }
-    public class Calc : Dictionary<string, Signals> { }
 
     public class Gate
     {
