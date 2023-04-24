@@ -12,7 +12,8 @@ try
     //AdventOfCodeRunner.RunParts<Day05_DoesntHeHaveInternElvesForThis>();
     //AdventOfCodeRunner.RunParts<Day06_ProbablyAFireHazard>();
     //AdventOfCodeRunner.RunParts<Day07_SomeAssemblyRequired>();
-    AdventOfCodeRunner.RunParts<Day08_Matchsticks>();
+    //AdventOfCodeRunner.RunParts<Day08_Matchsticks>();
+    AdventOfCodeRunner.RunParts<Day09_AllInASingleNight>();
 }
 catch (Exception ex)
 {
