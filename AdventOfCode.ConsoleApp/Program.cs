@@ -1,5 +1,6 @@
 ﻿using AdventOfCode.ConsoleApp;
 using AdventOfCode.ConsoleApp._2015;
+using AdventOfCode.ConsoleApp._2021;
 
 App.SetProjectRootFolder();
 
@@ -12,7 +13,8 @@ try
     //AdventOfCodeRunner.RunParts<Day05_DoesntHeHaveInternElvesForThis>();
     //AdventOfCodeRunner.RunParts<Day06_ProbablyAFireHazard>();
     //AdventOfCodeRunner.RunParts<Day07_SomeAssemblyRequired>();
-    AdventOfCodeRunner.RunParts<Day08_Matchsticks>();
+    //AdventOfCodeRunner.RunParts<Day08_Matchsticks>();
+    AdventOfCodeRunner.RunParts<Day06_Lanternfish>();
 }
 catch (Exception ex)
 {
