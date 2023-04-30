@@ -15,6 +15,7 @@ try
     //AdventOfCodeRunner.RunParts<Day07_SomeAssemblyRequired>();
     //AdventOfCodeRunner.RunParts<Day08_Matchsticks>();
     //AdventOfCodeRunner.RunParts<Day09_AllInASingleNight>();
+    AdventOfCodeRunner.RunParts<Day10_ElvesLookElvesSay>();
     //AdventOfCodeRunner.RunParts<Day06_Lanternfish>();
 }
 catch (Exception ex)
