@@ -1,22 +1,10 @@
 ﻿using AdventOfCode.ConsoleApp;
-using AdventOfCode.ConsoleApp._2015;
-using AdventOfCode.ConsoleApp._2021;
 
-App.SetProjectRootFolder();
+App.Startup(args);
 
 try
 {
-    //AdventOfCodeRunner.RunParts<Day01_NotQuiteLisp>();
-    //AdventOfCodeRunner.RunParts<Day02_IWasToldThereWouldBeNoMath>();
-    //AdventOfCodeRunner.RunParts<Day03_PerfectlySphericalHousesInAVacuum>();
-    //AdventOfCodeRunner.RunParts<Day04_TheIdealStockingStuffer>();
-    //AdventOfCodeRunner.RunParts<Day05_DoesntHeHaveInternElvesForThis>();
-    //AdventOfCodeRunner.RunParts<Day06_ProbablyAFireHazard>();
-    //AdventOfCodeRunner.RunParts<Day07_SomeAssemblyRequired>();
-    //AdventOfCodeRunner.RunParts<Day08_Matchsticks>();
-    //AdventOfCodeRunner.RunParts<Day09_AllInASingleNight>();
-    AdventOfCodeRunner.RunParts<Day10_ElvesLookElvesSay>();
-    //AdventOfCodeRunner.RunParts<Day06_Lanternfish>();
+    AdventOfCodeRunner.Run(App.Options);
 }
 catch (Exception ex)
 {

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace AdventOfCode.ConsoleApp._2015;
+namespace AdventOfCode._2015;
+
+[Challenge(2015, 4)]
 internal class Day04_TheIdealStockingStuffer
 {
     [Part(1)]

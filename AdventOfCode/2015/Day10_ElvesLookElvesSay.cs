@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
-namespace AdventOfCode.ConsoleApp._2015;
-public class Day10_ElvesLookElvesSay
+namespace AdventOfCode._2015;
+
+[Challenge(2015, 10)]
+internal class Day10_ElvesLookElvesSay
 {
     [Part(1)]
     public void ExecutePart01()
@@ -22,7 +20,7 @@ public class Day10_ElvesLookElvesSay
     }
 
     [Part(2)]
-    public void ExecutePart02() 
+    public void ExecutePart02()
     {
         var input = "3113322113";
         for (int i = 1; i <= 50; i++)
@@ -47,7 +45,7 @@ public class Day10_ElvesLookElvesSay
         Console.ResetColor();
     }
 
-    internal static string LookAndSay(string text)
+    public static string LookAndSay(string text)
     {
         var sb = new StringBuilder();
 

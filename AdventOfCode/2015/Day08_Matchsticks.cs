@@ -1,7 +1,9 @@
 ﻿
 using System.Text.RegularExpressions;
 
-namespace AdventOfCode.ConsoleApp._2015;
+namespace AdventOfCode._2015;
+
+[Challenge(2015, 8)]
 internal class Day08_Matchsticks
 {
     private string? _testData;

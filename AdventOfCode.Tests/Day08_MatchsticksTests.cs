@@ -1,9 +1,4 @@
-﻿using AdventOfCode.ConsoleApp._2015;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AdventOfCode._2015;
 
 namespace AdventOfCode.Tests;
 public class Day08_MatchsticksTests

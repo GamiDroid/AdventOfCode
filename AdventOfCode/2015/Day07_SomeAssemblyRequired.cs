@@ -1,7 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace AdventOfCode.ConsoleApp._2015;
+namespace AdventOfCode._2015;
 
+[Challenge(2015, 7)]
 internal class Day07_SomeAssemblyRequired
 {
     private string[] _testData = default!;

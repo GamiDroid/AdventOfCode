@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace AdventOfCode.ConsoleApp;
+namespace AdventOfCode;
 internal class ChallengeHelper
 {
     public static string GetResourceFilePath([CallerFilePath] string callerFilePath = "")

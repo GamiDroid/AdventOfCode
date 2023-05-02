@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode.ConsoleApp._2015;
+﻿namespace AdventOfCode._2015;
+
+[Challenge(2015, 1)]
 internal class Day01_NotQuiteLisp
 {
     private string _testData = string.Empty;
@@ -26,8 +28,7 @@ internal class Day01_NotQuiteLisp
 
     public static string GetTestData()
     {
-        var rootFolder = App.ProjectRootFolder;
-        var filePath = Path.Combine(rootFolder, "2015", "Resources", "NotQuiteLisp.txt");
+        var filePath = ChallengeHelper.GetResourceFilePath();
         return File.ReadAllText(filePath);
     }
 

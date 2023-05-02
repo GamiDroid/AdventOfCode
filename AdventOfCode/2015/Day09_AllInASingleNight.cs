@@ -6,9 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static AdventOfCode.ConsoleApp._2015.Day09_AllInASingleNight;
 
-namespace AdventOfCode.ConsoleApp._2015;
+namespace AdventOfCode._2015;
+
+[Challenge(2015, 9)]
 internal class Day09_AllInASingleNight
 {
     private TravelMap _map = null!;

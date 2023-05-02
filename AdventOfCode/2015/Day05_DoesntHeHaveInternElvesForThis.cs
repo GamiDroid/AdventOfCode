@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode.ConsoleApp._2015;
+﻿namespace AdventOfCode._2015;
+
+[Challenge(2015, 5)]
 internal class Day05_DoesntHeHaveInternElvesForThis
 {
     private string[] _testData = default!;
@@ -41,14 +43,13 @@ internal class Day05_DoesntHeHaveInternElvesForThis
 
     private static string[] GetTestData()
     {
-        var rootFolder = App.ProjectRootFolder;
-        var filePath = Path.Combine(rootFolder, "2015", "Resources", "DoesntHeHaveInternElvesForThis.txt");
+        var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);
 
         return lines;
     }
 
-    internal static bool IsNiceString(string input)
+    public static bool IsNiceString(string input)
     {
         if (ContainsDisallowedString(input))
             return false;
@@ -59,7 +60,7 @@ internal class Day05_DoesntHeHaveInternElvesForThis
         return (countVowels >= 3 && maxLettersInARow >= 2);
     }
 
-    internal static bool IsBetterNiceString(string input)
+    public static bool IsBetterNiceString(string input)
     {
         bool isNiceString = ContainsPairTwice(input);
         if (!isNiceString)
@@ -72,7 +73,7 @@ internal class Day05_DoesntHeHaveInternElvesForThis
         return true;
     }
 
-    internal static int CountVowels(ReadOnlySpan<char> input)
+    public static int CountVowels(ReadOnlySpan<char> input)
     {
         int counter = 0;
         foreach (char c in input)
@@ -83,7 +84,7 @@ internal class Day05_DoesntHeHaveInternElvesForThis
         return counter;
     }
 
-    internal static int GetMaxLettersInARow(ReadOnlySpan<char> input)
+    public static int GetMaxLettersInARow(ReadOnlySpan<char> input)
     {
         char? prevChar = null;
         int maxCounter = 0;
@@ -111,7 +112,7 @@ internal class Day05_DoesntHeHaveInternElvesForThis
         return maxCounter;
     }
 
-    internal static bool ContainsDisallowedString(string input)
+    public static bool ContainsDisallowedString(string input)
     {
         foreach (var part in s_naughtyStrings)
         {
@@ -121,7 +122,7 @@ internal class Day05_DoesntHeHaveInternElvesForThis
         return false;
     }
 
-    internal static bool ContainsPairTwice(ReadOnlySpan<char> input)
+    public static bool ContainsPairTwice(ReadOnlySpan<char> input)
     {
         for (int i = 0; i < input.Length - 2; i++)
         {
@@ -135,7 +136,7 @@ internal class Day05_DoesntHeHaveInternElvesForThis
         return false;
     }
 
-    internal static bool ContainsRepeatingLetterWithOneBetween(ReadOnlySpan<char> input)
+    public static bool ContainsRepeatingLetterWithOneBetween(ReadOnlySpan<char> input)
     {
         for (int i = 0; i < input.Length - 2; i++)
         {

@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿namespace AdventOfCode._2021;
 
-namespace AdventOfCode.ConsoleApp._2021;
+[Challenge(2021, 6)]
 public class Day06_Lanternfish
 {
     private string? _testData;

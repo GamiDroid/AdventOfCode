@@ -1,4 +1,4 @@
-﻿using AdventOfCode.ConsoleApp._2015;
+﻿using AdventOfCode._2015;
 
 namespace AdventOfCode.Tests;
 public class Day05_DoesntHeHaveInternElvesForThisTests

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static AdventOfCode.ConsoleApp._2015.Day07_SomeAssemblyRequired;
+﻿using static AdventOfCode._2015.Day07_SomeAssemblyRequired;
 
 namespace AdventOfCode.Tests;
 public class Day07_SomeAssemblyRequiredTests

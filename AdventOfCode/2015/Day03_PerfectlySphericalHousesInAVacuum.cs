@@ -1,6 +1,6 @@
-﻿using System.Numerics;
+﻿namespace AdventOfCode._2015;
 
-namespace AdventOfCode.ConsoleApp._2015;
+[Challenge(2015, 3)]
 internal class Day03_PerfectlySphericalHousesInAVacuum
 {
     private string _testData = string.Empty;
@@ -28,8 +28,7 @@ internal class Day03_PerfectlySphericalHousesInAVacuum
 
     private string GetTestData()
     {
-        var rootFolder = App.ProjectRootFolder;
-        var filePath = Path.Combine(rootFolder, "2015", "Resources", "PerfectlySphericalHousesInAVacuum.txt");
+        var filePath = ChallengeHelper.GetResourceFilePath();
         return File.ReadAllText(filePath);
     }
 

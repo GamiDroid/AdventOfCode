@@ -1,8 +1,9 @@
-﻿using System.Drawing;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-namespace AdventOfCode.ConsoleApp._2015;
-public partial class Day06_ProbablyAFireHazard
+namespace AdventOfCode._2015;
+
+[Challenge(2015, 6)]
+internal partial class Day06_ProbablyAFireHazard
 {
     private Action[] _testData = default!;
 
@@ -57,8 +58,7 @@ public partial class Day06_ProbablyAFireHazard
 
     private static Action[] GetTestData()
     {
-        var rootFolder = App.ProjectRootFolder;
-        var filePath = Path.Combine(rootFolder, "2015", "Resources", "ProbablyAFireHazard.txt");
+        var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);
 
         var actions = new List<Action>();

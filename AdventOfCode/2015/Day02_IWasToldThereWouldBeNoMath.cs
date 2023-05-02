@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode.ConsoleApp._2015;
+﻿namespace AdventOfCode._2015;
+
+[Challenge(2015, 2)]
 internal class Day02_IWasToldThereWouldBeNoMath
 {
     private BoxDimentions[] _testData = default!;
@@ -38,8 +40,7 @@ internal class Day02_IWasToldThereWouldBeNoMath
 
     private static BoxDimentions[] GetTestData()
     {
-        var rootFolder = App.ProjectRootFolder;
-        var filePath = Path.Combine(rootFolder, "2015", "Resources", "IWasToldThereWouldBeNoMath.txt");
+        var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);
 
         var dimentions = new List<BoxDimentions>();
