@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AdventOfCode.ConsoleApp\AdventOfCode.ConsoleApp.csproj" />
+    <ProjectReference Include="..\AdventOfCode\AdventOfCode.csproj" />
   </ItemGroup>
 
 </Project>
