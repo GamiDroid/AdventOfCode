@@ -81,7 +81,6 @@ internal class Day15_ScienceForHungryPeople
         uint highestScore = 0;
         Backtrack(4, 100, a => 
         {
-            Console.WriteLine(string.Join(", ", a));
             var (score, calories) = GetRecipeScore(recipe, a);
             if (calories == 500 && score > highestScore)
             {

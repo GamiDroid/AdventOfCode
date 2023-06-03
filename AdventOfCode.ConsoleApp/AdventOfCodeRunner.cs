@@ -35,16 +35,24 @@ internal static class AdventOfCodeRunner
 
     private static int ChooseDay(int year)
     {
+        int day = 0;
         foreach (var challenge in _challenges.Where(c => c.Key.Year == year))
         {
             Console.WriteLine($"{challenge.Key.Year} {challenge.Key.Day} : {challenge.Value.Name}");
+            day = challenge.Key.Day;
         }
 
-        int day;
         while (true)
         {
-            Console.Write("Day: ");
+            if (day > 0)
+                Console.Write("Day (default '{0}'): ", day);
+            else
+                Console.Write("Day: ");
+
             var input = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(input) && day > 0)
+                break;
 
             if (int.TryParse(input, out day))
             {
