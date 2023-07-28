@@ -37,5 +37,37 @@ internal class Day17_NoSuchThingAsTooMuch
     public void Part01()
     {
         Console.WriteLine($"There are {_containerSizes.Length} container sizes");
+
+        var count = CountCombinations(_containerSizes, 150);
+
+        Console.WriteLine("Amount of combinations: {0}", count);
+    }
+
+    private static int CountCombinations(int[] containers, int neededSize)
+    {
+        var count = Permutations(containers, neededSize, 0, 0, 0);
+
+        return count;
+    }
+
+    private static int Permutations(int[] containerSizes, int neededSize, int index, int size, int count)
+    {
+        if (index == containerSizes.Length || size >= neededSize)
+        {
+            if (size == neededSize)
+            {
+                return count + 1;
+            }
+        }
+        else
+        {
+            for (int i = index; i < containerSizes.Length; i++)
+            {
+                int newSize = size + containerSizes[i];
+                count = Permutations(containerSizes, neededSize, i + 1, newSize, count);
+            }
+        }
+
+        return count;
     }
 }
