@@ -27,11 +27,33 @@ internal class Day18_LikeAGIFForYourYard
     [Part(1)]
     public void Part01()
     {
-        Console.WriteLine("Initial there are {0} lights on.", _lights.CountLightOn());
+        var lights = new Lights(_lights);
 
-        _lights.ElapseTime(100);
+        Console.WriteLine("Initial there are {0} lights on.", lights.CountLightOn());
 
-        Console.WriteLine("After 100 times there are {0} lights on.", _lights.CountLightOn());
+        lights.ElapseTime(100);
+
+        Console.WriteLine("After 100 times there are {0} lights on.", lights.CountLightOn());
+    }
+
+    [Part(2)]
+    public void Part02()
+    {
+        var lights = new Lights(_lights);
+
+        Console.WriteLine("Initial there are {0} lights on.", lights.CountLightOn());
+
+        // Turn corners on.
+        lights[0, 0] = true;
+        lights[0, 99] = true;
+        lights[99, 0] = true;
+        lights[99, 99] = true;
+
+        lights.UsePart2Check = true;
+
+        lights.ElapseTime(100);
+
+        Console.WriteLine("After 100 times there are {0} lights on.", lights.CountLightOn());
     }
 
     public class Lights
@@ -44,11 +66,22 @@ internal class Day18_LikeAGIFForYourYard
             _lights = new bool[_maxX, _maxY];
         }
 
+        public Lights(Lights other)
+        {
+            _maxX = other._maxX;
+            _maxY = other._maxY;
+
+            _lights = new bool[_maxX, _maxY];
+            SetLights(other._lights);
+        }
+
         public bool this[int x, int y] 
         { 
             get => _lights[x, y]; 
             set => _lights[x, y] = value; 
         }
+
+        public bool UsePart2Check { get; set; }
 
         public void ElapseTime(int time) 
         {
@@ -91,7 +124,7 @@ internal class Day18_LikeAGIFForYourYard
             {
                 for (int x = 0; x < _maxX; x++)
                 {
-                    if (LightMustBeToggled(x, y))
+                    if (UsePart2Check ? LightMustBeToggledPart2(x, y) : LightMustBeToggled(x, y))
                         lightsToToggle.Add((x , y));
                 }
             }
@@ -108,6 +141,19 @@ internal class Day18_LikeAGIFForYourYard
             return lightIsOn ? 
                 adjancentLightsOnCount != 2 && adjancentLightsOnCount != 3 : 
                 adjancentLightsOnCount == 3;
+        }
+
+        private bool LightMustBeToggledPart2(int x, int y)
+        {
+            if ((x == 0 && y == 0) ||
+                (x == 0 && y == _maxY-1) ||
+                (x == _maxX-1 && y == 0) ||
+                (x == _maxX-1 && y == _maxY - 1))
+            {
+                return false;
+            }
+
+            return LightMustBeToggled(x, y);
         }
 
         private int CountAdjacentLightsOn(int x, int y)
@@ -135,6 +181,15 @@ internal class Day18_LikeAGIFForYourYard
             }
 
             return count;
+        }
+
+        private void SetLights(bool[,] lights)
+        {
+            for (int y = 0; y < _maxY; y++)
+            {
+                for (int x = 0; x < _maxX; x++)
+                    _lights[x, y] = lights[x, y];
+            }
         }
 
         private readonly bool[,] _lights;
