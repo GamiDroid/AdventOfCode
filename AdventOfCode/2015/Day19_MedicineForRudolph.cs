@@ -73,36 +73,40 @@ internal class Day19_MedicineForRudolph
     {
         var startValue = "e";
 
-        var queue = new Queue<(string, int)>();
-        queue.Enqueue((startValue, 0));
-
-        var depth = BreadthFirstSearch(_molecule, queue);
+        var depth = BreadthFirstSearch(_molecule, startValue);
 
         Console.WriteLine("Depth found: {0}", depth);
     }
 
-    private int BreadthFirstSearch(string molecule, Queue<(string, int)> queue)
+    private int BreadthFirstSearch(string molecule, string startValue)
     {
+        var visited = new HashSet<string>();
+
+        var queue = new Queue<(string, int)>();
+        queue.Enqueue((startValue, 0));
+
         while (queue.TryDequeue(out var o))
         {
-            var m = o.Item1;
+            var current = o.Item1;
             var depth = o.Item2;
 
-            if (m == molecule)
+            if (current == molecule)
                 return depth;
 
-            foreach ((var m2, var r) in _replacements)
+            foreach ((var m2, var r) in _replacements.Where(i => current.Contains(i.Item1)).ToList())
             {
                 var index = 0;
                 do
                 {
-                    index = m.IndexOf(m, index);
+                    index = current.IndexOf(m2, index);
                     if (index >= 0)
                     {
-                        string newMolecule = ReplaceAt(m, m2, r, index);
+                        string newMolecule = ReplaceAt(current, m2, r, index);
 
-                        queue.Enqueue((newMolecule, depth + 1));
+                        if (!visited.Contains(newMolecule) && (newMolecule.Length <= molecule.Length))
+                            queue.Enqueue((newMolecule, depth + 1));
 
+                        visited.Add(newMolecule);
                         index++;
                     }
                 }
