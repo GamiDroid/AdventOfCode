@@ -47,7 +47,7 @@ internal class Day19_MedicineForRudolph
                 index = _molecule.IndexOf(m, index);
                 if (index >= 0)
                 {
-                    string newMolecule = ReplaceAt(_molecule, m, r, index);
+                    var newMolecule = ReplaceAt(_molecule, m, r, index).ToString();
 
                     generatedMolocules.Add(newMolecule);
                     index++;
@@ -59,11 +59,10 @@ internal class Day19_MedicineForRudolph
         Console.WriteLine("Unique molecules: {0}", generatedMolocules.Count);
     }
 
-    private static string ReplaceAt(string original, string oldStr, string newStr, int index)
+    private static ReadOnlySpan<char> ReplaceAt(ReadOnlySpan<char> original, ReadOnlySpan<char> oldStr, ReadOnlySpan<char> newStr, int index)
     {
-        var span = original.AsSpan();
-        var begin = span[..index];
-        var end = span[(index + oldStr.Length)..];
+        var begin = original[..index];
+        var end = original[(index + oldStr.Length)..];
 
         return string.Concat(begin, newStr, end);
     }
@@ -73,12 +72,21 @@ internal class Day19_MedicineForRudolph
     {
         var startValue = "e";
 
-        var depth = BreadthFirstSearch(_molecule, startValue);
+        var replacements = new List<(string, string)>()
+        {
+            ("e", "O"),
+            ("e", "H"),
+            ("H", "OH"),
+            ("H", "HO"),
+            ("O", "HH"),
+        };
+
+        var depth = BreadthFirstSearch("HOHOHO", replacements, startValue);
 
         Console.WriteLine("Depth found: {0}", depth);
     }
 
-    private int BreadthFirstSearch(string molecule, string startValue)
+    private static int BreadthFirstSearch(string molecule, IEnumerable<(string, string)> replacements, string startValue)
     {
         var visited = new HashSet<string>();
 
@@ -93,7 +101,7 @@ internal class Day19_MedicineForRudolph
             if (current == molecule)
                 return depth;
 
-            foreach ((var m2, var r) in _replacements.Where(i => current.Contains(i.Item1)).ToList())
+            foreach ((var m2, var r) in replacements.Where(i => current.Contains(i.Item1)).ToList())
             {
                 var index = 0;
                 do
@@ -101,7 +109,7 @@ internal class Day19_MedicineForRudolph
                     index = current.IndexOf(m2, index);
                     if (index >= 0)
                     {
-                        string newMolecule = ReplaceAt(current, m2, r, index);
+                        var newMolecule = ReplaceAt(current, m2, r, index).ToString();
 
                         if (!visited.Contains(newMolecule) && (newMolecule.Length <= molecule.Length))
                             queue.Enqueue((newMolecule, depth + 1));
@@ -110,7 +118,7 @@ internal class Day19_MedicineForRudolph
                         index++;
                     }
                 }
-                while (index > 0 && index <= _molecule.Length - 1);
+                while (index > 0 && index <= molecule.Length - 1);
             }
         }
 
