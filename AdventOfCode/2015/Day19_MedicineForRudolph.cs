@@ -72,6 +72,7 @@ internal class Day19_MedicineForRudolph
     {
         var startValue = "e";
 
+        var molecule = "HOHOHO";
         var replacements = new List<(string, string)>()
         {
             ("e", "O"),
@@ -81,38 +82,40 @@ internal class Day19_MedicineForRudolph
             ("O", "HH"),
         };
 
-        var depth = BreadthFirstSearch("HOHOHO", replacements, startValue);
+        var depth = BreadthFirstSearch(startValue, _replacements, _molecule);
 
         Console.WriteLine("Depth found: {0}", depth);
     }
 
-    private static int BreadthFirstSearch(string molecule, IEnumerable<(string, string)> replacements, string startValue)
+    private static int BreadthFirstSearch(string molecule, IEnumerable<(string Old, string New)> replacements, string startValue)
     {
         var visited = new HashSet<string>();
 
-        var queue = new Queue<(string, int)>();
-        queue.Enqueue((startValue, 0));
+        var queue = new PriorityQueue<(string, int), int>();
+        queue.Enqueue((startValue, 0), startValue.Length);
 
-        while (queue.TryDequeue(out var o))
+        while (queue.TryDequeue(out var i, out var _))
         {
-            var current = o.Item1;
-            var depth = o.Item2;
+            var current = i.Item1;
+            var depth = i.Item2;
 
             if (current == molecule)
                 return depth;
 
-            foreach ((var m2, var r) in replacements.Where(i => current.Contains(i.Item1)).ToList())
+            foreach ((var o, var n) in replacements)
             {
                 var index = 0;
                 do
                 {
-                    index = current.IndexOf(m2, index);
+                    index = current.IndexOf(n, index);
                     if (index >= 0)
                     {
-                        var newMolecule = ReplaceAt(current, m2, r, index).ToString();
+                        var newMolecule = ReplaceAt(current, n, o, index).ToString();
 
-                        if (!visited.Contains(newMolecule) && (newMolecule.Length <= molecule.Length))
-                            queue.Enqueue((newMolecule, depth + 1));
+                        if (newMolecule == molecule) return depth+1;
+
+                        if (!visited.Contains(newMolecule))
+                            queue.Enqueue((newMolecule, depth + 1), newMolecule.Length);
 
                         visited.Add(newMolecule);
                         index++;
