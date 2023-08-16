@@ -10,19 +10,26 @@ namespace AdventOfCode._2015;
 internal class Day20_InfiniteElvesAndInfiniteHouses
 {
     [Part(1)]
-    public void Part01()
+    public static void Part01()
     {
         var house = Solve();
         Console.WriteLine($"House {house} is lowest number with gets presents");
     }
 
-    private static int Solve()
+    [Part(2)]
+    public static void Part02()
     {
-        var puzzleInput = 34000000;
+        var house = Solve(isPart2: true);
+        Console.WriteLine($"House {house} is lowest number with gets presents");
+    }
+
+    private static long Solve(bool isPart2 = false)
+    {
+        var puzzleInput = 34_000_000;
 
         // For part A we don't have to multiply, since we also divided the input by 10
-        var divide =  10;
-        var multiply = 1;
+        var divide = isPart2 ? 1 : 10;
+        var multiply = isPart2 ? 11 : 1;
 
         var input = puzzleInput / divide;
         var houses = new int[input];
@@ -40,6 +47,9 @@ internal class Day20_InfiniteElvesAndInfiniteHouses
                     results.Add(house);
 
                 visits++;
+
+                if (isPart2 && visits == 50)
+                    break;
             }
         }
 
