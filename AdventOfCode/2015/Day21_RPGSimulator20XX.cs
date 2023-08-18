@@ -1,7 +1,7 @@
 ﻿namespace AdventOfCode._2015;
 
 [Challenge(2015, 21)]
-internal class Day21_RPG_Simulator_20XX
+internal class Day21_RPGSimulator20XX
 {
     private static readonly Item[] s_items = new Item[]
     {
