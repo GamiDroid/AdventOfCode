@@ -21,8 +21,8 @@ internal class Day22_WizardSimulator20XX
             if (game.DoTurn()) break;
         }
 
-        var playerWon = game.PlayerWon();
-        Console.WriteLine($"player won: {playerWon}");
+        var playerWon = game.PlayerWon(out int totalMana);
+        Console.WriteLine($"player won: {playerWon}, mana: {totalMana}");
     }
 
     public class Game
@@ -39,6 +39,9 @@ internal class Day22_WizardSimulator20XX
         {
             _target = _boss;
             _attacker = _player;
+
+            var comparer = new SpellComparer(_player, _boss);
+            _player.UseSpellComparer(comparer);
         }
 
         public bool DoTurn()
@@ -46,6 +49,9 @@ internal class Day22_WizardSimulator20XX
             Console.WriteLine($"-- {_attacker.Name} turn --");
             _player.PrintStats();
             _boss.PrintStats();
+
+            _player.HandleEffects();
+            _boss.HandleEffects();
 
             var targetDied = _attacker.DoAction(_target);
             _gameEnded = targetDied;
@@ -56,21 +62,50 @@ internal class Day22_WizardSimulator20XX
             return _gameEnded;
         }
 
-        public bool PlayerWon()
+        public bool PlayerWon(out int totalManaSpend)
         {
             if (!_gameEnded)
                 throw new InvalidOperationException("Game has not ended yet.");
+            totalManaSpend = _player.TotalManaSpend;
             return _boss.HitPoints <= 0 && _player.HitPoints > 0;
         }
 
         private void SwitchAttackerTarget() => (_attacker, _target) = (_target, _attacker);
     }
 
+    public class SpellComparer : IComparer<Spell>
+    {
+        private readonly Player _player;
+        private readonly Boss _boss;
+
+        public SpellComparer(Player player, Boss boss)
+        {
+            _player = player;
+            _boss = boss;
+        }
+
+        int IComparer<Spell>.Compare(Spell? x, Spell? y)
+        {
+            if (x == null && y == null) return 0;
+            if (x is null) return 1;
+            if (y is null) return -1;
+            if (x == y) return 0;
+
+            if (x.ManaCost > y.ManaCost) return 1;
+
+            return 0;
+        }
+    }
+
     public class Player : Entity
     {
+        private IComparer<Spell>? _spellComparer;
+
         public Player(int hp, int mana) : base("Player", hp, mana)
         {
         }
+
+        public void UseSpellComparer(IComparer<Spell> comparer) => _spellComparer = comparer;
 
         public int TotalManaSpend { get; private set; }
 
@@ -91,8 +126,8 @@ internal class Day22_WizardSimulator20XX
             if (!spells.Any())
                 return null;
 
-            var random = new Random().Next(0, spells.Count - 1);
-            return spells.ElementAt(random);
+            var spell =  spells.Order(_spellComparer).First();
+            return spell;
         }
 
         private ICollection<Spell> GetAvailableSpells(Entity target)
@@ -162,8 +197,12 @@ internal class Day22_WizardSimulator20XX
             foreach (var effect in _activeEffects)
             {
                 if (effect.EachTurn)
+                {
+                    Console.WriteLine($"{effect.Type} handled");
                     effect.OnActive(this);
+                }
                 effect.DecreaseTurns();
+                Console.WriteLine($"{effect.Type} {effect.Turns} turns left");
 
                 if (effect.Turns <= 0)
                     effect.OnDeactivate?.Invoke(this);
