@@ -39,9 +39,6 @@ internal class Day22_WizardSimulator20XX
         {
             _target = _boss;
             _attacker = _player;
-
-            var comparer = new SpellComparer(_player, _boss);
-            _player.UseSpellComparer(comparer);
         }
 
         public bool DoTurn()
@@ -73,39 +70,11 @@ internal class Day22_WizardSimulator20XX
         private void SwitchAttackerTarget() => (_attacker, _target) = (_target, _attacker);
     }
 
-    public class SpellComparer : IComparer<Spell>
-    {
-        private readonly Player _player;
-        private readonly Boss _boss;
-
-        public SpellComparer(Player player, Boss boss)
-        {
-            _player = player;
-            _boss = boss;
-        }
-
-        int IComparer<Spell>.Compare(Spell? x, Spell? y)
-        {
-            if (x == null && y == null) return 0;
-            if (x is null) return 1;
-            if (y is null) return -1;
-            if (x == y) return 0;
-
-            if (x.ManaCost > y.ManaCost) return 1;
-
-            return 0;
-        }
-    }
-
     public class Player : Entity
     {
-        private IComparer<Spell>? _spellComparer;
-
         public Player(int hp, int mana) : base("Player", hp, mana)
         {
         }
-
-        public void UseSpellComparer(IComparer<Spell> comparer) => _spellComparer = comparer;
 
         public int TotalManaSpend { get; private set; }
 
@@ -126,7 +95,16 @@ internal class Day22_WizardSimulator20XX
             if (!spells.Any())
                 return null;
 
-            var spell =  spells.Order(_spellComparer).First();
+            var spell = ChooseSpellFromAvailableSpells(spells.ToArray(), this, target);
+
+            return spell;
+        }
+
+        private static Spell ChooseSpellFromAvailableSpells(Spell[] spells, Player player, Entity target)
+        {
+            var spellIndex = new Random().Next(0, spells.Length - 1);
+            var spell = spells[spellIndex];
+
             return spell;
         }
 
