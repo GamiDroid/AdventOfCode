@@ -47,16 +47,29 @@ internal class Day22_WizardSimulator20XX
             _player.PrintStats();
             _boss.PrintStats();
 
-            _player.HandleEffects();
-            _boss.HandleEffects();
+            if (_player.HandleEffects())
+            {
+                _gameEnded = true;
+                return true;
+            }
 
-            var targetDied = _attacker.DoAction(_target);
-            _gameEnded = targetDied;
+            if (_boss.HandleEffects())
+            {
+                _gameEnded = true;
+                return true;
+            }
+
+            if (_attacker.DoAction(_target))
+            {
+                _gameEnded = true;
+                return true;
+            }
 
             Console.WriteLine();
             if (!_gameEnded)
                 SwitchAttackerTarget();
-            return _gameEnded;
+
+            return false;
         }
 
         public bool PlayerWon(out int totalManaSpend)
@@ -170,7 +183,7 @@ internal class Day22_WizardSimulator20XX
 
         public abstract bool DoAction(Entity target);
 
-        public void HandleEffects()
+        public bool HandleEffects()
         {
             foreach (var effect in _activeEffects)
             {
@@ -187,6 +200,8 @@ internal class Day22_WizardSimulator20XX
             }
 
             _activeEffects.RemoveAll(e => e.Turns <= 0);
+
+            return HitPoints <= 0;
         }
 
         /// <summary>
