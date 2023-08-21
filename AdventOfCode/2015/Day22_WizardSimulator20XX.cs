@@ -192,6 +192,12 @@ internal class Day22_WizardSimulator20XX
                     Console.WriteLine($"{effect.Type} handled");
                     effect.OnActive(this);
                 }
+                else if (effect.FirstActivation)
+                {
+                    Console.WriteLine($"{effect.Type} handled");
+                    effect.OnActive(this);
+                }
+
                 effect.DecreaseTurns();
                 Console.WriteLine($"{effect.Type} {effect.Turns} turns left");
 
@@ -248,8 +254,11 @@ internal class Day22_WizardSimulator20XX
 
     public record Effect(EffectType Type, int Turns, Action<Entity> OnActive, Action<Entity>? OnDeactivate = null, bool EachTurn = true)
     {
+        private readonly int _startTurns = Turns;
+
         public int Turns { get; private set; }  = Turns;
         public int DecreaseTurns() => Turns--;
+        public bool FirstActivation => Turns == _startTurns;
 
         /// <summary>
         /// +7 armor when active
