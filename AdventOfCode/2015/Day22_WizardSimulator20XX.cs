@@ -14,15 +14,26 @@ internal class Day22_WizardSimulator20XX
     [Part(1)]
     public void Part01()
     {
-        var game = new Game();
+        var minimalManaUsed = -1;
 
         while (true)
         {
-            if (game.DoTurn()) break;
-        }
+            var game = new Game();
 
-        var playerWon = game.PlayerWon(out int totalMana);
-        Console.WriteLine($"player won: {playerWon}, mana: {totalMana}");
+            while (true)
+            {
+                if (game.DoTurn()) break;
+            }
+
+            var playerWon = game.PlayerWon(out int totalMana);
+            Console.WriteLine($"player won: {playerWon}, mana: {totalMana}, turns: {game.Turns}");
+            Console.WriteLine();
+            if (playerWon)
+            {
+                minimalManaUsed = minimalManaUsed == -1 ? totalMana : 
+                    (minimalManaUsed > totalMana) ? totalMana : minimalManaUsed;
+            }
+        }
     }
 
     public class Game
@@ -35,6 +46,8 @@ internal class Day22_WizardSimulator20XX
 
         private bool _gameEnded;
 
+        public int Turns { get; private set; }
+
         public Game()
         {
             _target = _boss;
@@ -43,7 +56,7 @@ internal class Day22_WizardSimulator20XX
 
         public bool DoTurn()
         {
-            Console.WriteLine($"-- {_attacker.Name} turn --");
+            Console.WriteLine($"-- {_attacker.Name} turn [{++Turns}]--");
             _player.PrintStats();
             _boss.PrintStats();
 
@@ -108,14 +121,25 @@ internal class Day22_WizardSimulator20XX
             if (!spells.Any())
                 return null;
 
-            var spell = ChooseSpellFromAvailableSpells(spells.ToArray(), this, target);
+            var spell = ChooseSpellFromAvailableSpellUsingPlayerInput(spells.ToArray(), this, target);
 
             return spell;
         }
 
-        private static Spell ChooseSpellFromAvailableSpells(Spell[] spells, Player player, Entity target)
+        private static Spell ChooseSpellFromAvailableSpellsUsingScore(Spell[] spells, Player player, Entity target)
         {
-            var spellIndex = new Random().Next(0, spells.Length - 1);
+            var spell = spells.OrderByDescending(s => s.Score)
+                .ThenBy(s => s.ManaCost)
+                .FirstOrDefault();
+            return spell!;
+        }
+
+        private static Spell ChooseSpellFromAvailableSpellUsingPlayerInput(Spell[] spells, Player player, Entity target)
+        {
+            for (int i = 0; i < spells.Length; i++)
+                Console.WriteLine($"{i}: {spells[i].Name,15} {spells[i].ManaCost, 5}");
+
+            var spellIndex = int.Parse(Console.ReadLine() ?? "");
             var spell = spells[spellIndex];
 
             return spell;
@@ -250,7 +274,8 @@ internal class Day22_WizardSimulator20XX
         string Name, 
         int ManaCost, 
         Action<Entity, Entity> Cast,
-        Func<Entity, Entity, bool>? CanCast = null);
+        Func<Entity, Entity, bool>? CanCast = null, 
+        int Score = 0);
 
     public record Effect(EffectType Type, int Turns, Action<Entity> OnActive, Action<Entity>? OnDeactivate = null, bool EachTurn = true)
     {
