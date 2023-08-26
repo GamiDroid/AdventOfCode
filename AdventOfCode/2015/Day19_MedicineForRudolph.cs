@@ -72,16 +72,6 @@ internal class Day19_MedicineForRudolph
     {
         var startValue = "e";
 
-        var molecule = "HOHOHO";
-        var replacements = new List<(string, string)>()
-        {
-            ("e", "O"),
-            ("e", "H"),
-            ("H", "OH"),
-            ("H", "HO"),
-            ("O", "HH"),
-        };
-
         var depth = BreadthFirstSearch(startValue, _replacements, _molecule);
 
         Console.WriteLine("Depth found: {0}", depth);

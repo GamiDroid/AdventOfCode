@@ -1,310 +1,280 @@
-﻿namespace AdventOfCode._2015;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace AdventOfCode._2015;
 [Challenge(2015, 22)]
 internal class Day22_WizardSimulator20XX
 {
     private readonly static Spell[] s_spells =
     {
-        new("Magic Missile", ManaCost: 53, Cast: (_, t) => t.TakeDamage(4)),
-        new("Drain", ManaCost: 73, Cast: (c, t) => { t.TakeDamage(2); c.Heal(2); }),
-        new("Shield", ManaCost: 113, Cast: (c, _) => c.GiveEffect(Effect.Shield(6)), CanCast: (c, _) => !c.HasEffect(EffectType.Shield)),
-        new("Poison", ManaCost: 173, Cast: (_, t) => t.GiveEffect(Effect.Poison(6)), CanCast: (c, t) => !t.HasEffect(EffectType.Poison)),
-        new("Recharge", ManaCost: 229, Cast: (c, _) => c.GiveEffect(Effect.Recharge(5)), CanCast: (c, _) => !c.HasEffect(EffectType.Recharge))
+        new("Magic Missile", ManaCost: 53, Cast: (g) => g.DamageBoss(4)),
+        new("Drain", ManaCost: 73, Cast: (g) => { g.DamageBoss(2); g.HealPlayer(2); }),
+        new("Shield", ManaCost: 113, Cast: (g) => g.SetEffectTimer("Shield", 6), CanCast: (g) => !g.IsEffectActive("Shield")),
+        new("Poison", ManaCost: 173, Cast: (g) => g.SetEffectTimer("Poison", 6), CanCast: (g) => !g.IsEffectActive("Poison")),
+        new("Recharge", ManaCost: 229, Cast: (g) => g.SetEffectTimer("Recharge", 5), CanCast :(g) => !g.IsEffectActive("Recharge"))
     };
 
     [Part(1)]
-    public void Part01()
+    public static void Part01()
     {
-        var minimalManaUsed = -1;
+        SolveGame();
+    }
 
-        while (true)
+    [Part(2)]
+    public static void Part02()
+    {
+        SolveGame(hard: true);
+    }
+
+    public static void SolveGame(bool hard = false)
+    {
+        var queue = new PriorityQueue<GameState, int>();
+
+        // CHALLENGE:
+        var state = new GameState(playerHp: 50, playerMana: 500, bossHp: 71);
+        var game = new Game(10, hard);
+
+        queue.Enqueue(state, state.ManaUsed);
+
+        while (queue.Count > 0)
         {
-            var game = new Game();
+            state = queue.Dequeue();
+            game.SetGameState(state);
 
-            while (true)
-            {
-                if (game.DoTurn()) break;
-            }
+            if (game.HandleTurn(out int spellCount) && game.BossDied())
+                break;
 
-            var playerWon = game.PlayerWon(out int totalMana);
-            Console.WriteLine($"player won: {playerWon}, mana: {totalMana}, turns: {game.Turns}");
-            Console.WriteLine();
-            if (playerWon)
+            var newState = game.SaveGameState();
+
+            if (newState.PlayerHp > 0)
+                queue.Enqueue(newState, newState.ManaUsed);
+
+            if (state.PlayerTurn)
             {
-                minimalManaUsed = minimalManaUsed == -1 ? totalMana : 
-                    (minimalManaUsed > totalMana) ? totalMana : minimalManaUsed;
+                var increm = state.IncrementSpellIndex();
+                if (increm.SpellIndex < spellCount)
+                    queue.Enqueue(increm, increm.ManaUsed);
             }
         }
+
+        if (game.BossDied())
+            Console.WriteLine($"Player won with {game.ManaUsed} mana");
+        else
+            Console.WriteLine("Queue is empty but the player did not win :(");
     }
 
     public class Game
     {
-        private readonly Player _player = new(50, 500);
-        private readonly Boss _boss = new(71, 10);
+        private bool _playerTurn;
+        private int _playerHp;
+        private int _playerMana;
+        private int _manaUsed;
 
-        private Entity _target;
-        private Entity _attacker;
+        private int _bossHp;
 
-        private bool _gameEnded;
+        private int _timerShieldEffect;
+        private int _timerPoisonEffect;
+        private int _timerRechargeEffect;
 
-        public int Turns { get; private set; }
+        private int _spellIndex;
 
-        public Game()
+        private readonly int _bossStrength;
+
+        private readonly bool _hardMode;
+
+        public Game(int bossStrength, bool hard = false)
         {
-            _target = _boss;
-            _attacker = _player;
+            _bossStrength = bossStrength;
+            _hardMode = hard;
         }
 
-        public bool DoTurn()
+        public void SetGameState(GameState state)
         {
-            Console.WriteLine($"-- {_attacker.Name} turn [{++Turns}]--");
-            _player.PrintStats();
-            _boss.PrintStats();
+            _playerTurn = state.PlayerTurn;
 
-            if (_player.HandleEffects())
+            _playerHp = state.PlayerHp;
+            _playerMana = state.PlayerMana;
+            _manaUsed = state.ManaUsed;
+
+            _bossHp = state.BossHp;
+
+            _timerShieldEffect = state.TimerShieldEffect;
+            _timerPoisonEffect = state.TimerPoisonEffect;
+            _timerRechargeEffect = state.TimerRechargeEffect;
+
+            _spellIndex = state.SpellIndex;
+        }
+
+        public GameState SaveGameState() => new()
+        {
+            PlayerTurn = _playerTurn,
+            PlayerHp = _playerHp,
+            PlayerMana = _playerMana,
+            ManaUsed = _manaUsed,
+            
+            BossHp = _bossHp,
+
+            TimerShieldEffect = _timerShieldEffect,
+            TimerPoisonEffect = _timerPoisonEffect,
+            TimerRechargeEffect = _timerRechargeEffect,
+
+            SpellIndex = 0,
+        };
+
+        public int ManaUsed => _manaUsed;
+
+        public int CountAvailableSpells() => GetAvailableSpells().Length;
+
+        public bool HandleTurn(out int spellCount)
+        {
+            spellCount = 0;
+            if (_hardMode && _playerTurn)
             {
-                _gameEnded = true;
-                return true;
+                _playerHp--;
+                if (_playerHp <= 0)
+                    return true;
             }
 
-            if (_boss.HandleEffects())
+            HandleEffects();
+
+            if (_playerTurn) HandlePlayerTurn(out spellCount);
+            else HandleBossTurn();
+
+            var isEnded = IsEnded();
+
+            if (!isEnded)
+                ChangeTurns();
+            return isEnded;
+        }
+
+        public void DamageBoss(int damage) => _bossHp -= damage;
+        public void HealPlayer(int hp) => _playerHp += hp;
+
+        public void SetEffectTimer(string effect, int timer)
+        {
+            var _ = effect.ToLowerInvariant() switch
             {
-                _gameEnded = true;
-                return true;
+                "shield" => _timerShieldEffect = timer,
+                "poison" => _timerPoisonEffect = timer,
+                "recharge" => _timerRechargeEffect = timer,
+                _ => throw new ArgumentException($"'{effect}' is no effect.", nameof(effect))
+            };
+        }
+
+        public bool IsEffectActive(string effect)
+        {
+            return effect.ToLowerInvariant() switch
+            {
+                "shield" => _timerShieldEffect > 0,
+                "poison" => _timerPoisonEffect > 0,
+                "recharge" => _timerRechargeEffect > 0,
+                _ => throw new ArgumentException($"'{effect}' is no effect.", nameof(effect))
+            };
+        }
+
+        public bool IsEnded() => _playerHp <= 0 || _playerMana <= 0 || _bossHp <= 0;
+
+        public bool BossDied() => _bossHp <= 0;
+
+        private void HandleEffects()
+        {
+            if (_timerShieldEffect > 0)
+                _timerShieldEffect--;
+
+            if (_timerPoisonEffect > 0)
+            {
+                _bossHp -= 3;
+               _timerPoisonEffect--;
             }
 
-            if (_attacker.DoAction(_target))
+            if (_timerRechargeEffect > 0)
             {
-                _gameEnded = true;
-                return true;
+                _playerMana += 101;
+                _timerRechargeEffect--;
             }
-
-            Console.WriteLine();
-            if (!_gameEnded)
-                SwitchAttackerTarget();
-
-            return false;
         }
 
-        public bool PlayerWon(out int totalManaSpend)
+        private void HandlePlayerTurn(out int spellCount)
         {
-            if (!_gameEnded)
-                throw new InvalidOperationException("Game has not ended yet.");
-            totalManaSpend = _player.TotalManaSpend;
-            return _boss.HitPoints <= 0 && _player.HitPoints > 0;
+            var availableSpells = GetAvailableSpells();
+            spellCount = availableSpells.Length;
+
+            if (_spellIndex >= availableSpells.Length)
+                return;
+
+            var spell = availableSpells[_spellIndex];
+
+            spell.Cast(this);
+            
+            _playerMana -= spell.ManaCost;
+            _manaUsed += spell.ManaCost;
         }
 
-        private void SwitchAttackerTarget() => (_attacker, _target) = (_target, _attacker);
+        private Spell[] GetAvailableSpells()
+        {
+            return s_spells.Where(s => s.ManaCost <= _playerMana && (s.CanCast?.Invoke(this) ?? true)).ToArray();
+        }
+
+        private void HandleBossTurn()
+        {
+            var armor = GetPlayerArmor();
+
+            var damageTaken = _bossStrength - armor;
+            damageTaken = damageTaken < 1 ? 1 : damageTaken;
+
+            _playerHp -= damageTaken;
+        }
+
+        private int GetPlayerArmor()
+        {
+            return _timerShieldEffect > 0 ? 7 : 0;
+        }
+
+        private void ChangeTurns() => _playerTurn = !_playerTurn;
     }
 
-    public class Player : Entity
+    public readonly struct GameState
     {
-        public Player(int hp, int mana) : base("Player", hp, mana)
+        [SetsRequiredMembers]
+        public GameState(int playerHp, int playerMana, int bossHp)
         {
+            PlayerTurn = true;
+
+            PlayerHp = playerHp;
+            PlayerMana = playerMana;
+
+            BossHp = bossHp;
         }
 
-        public int TotalManaSpend { get; private set; }
+        public required bool PlayerTurn { get; init; }
 
-        public override bool DoAction(Entity target)
+        public required int PlayerHp { get; init; }
+        public required int PlayerMana { get; init; }
+        public required int ManaUsed { get; init; }
+
+        public required int BossHp { get; init; }
+
+        public required int TimerShieldEffect { get; init; }
+        public required int TimerPoisonEffect { get; init; }
+        public required int TimerRechargeEffect { get; init; }
+
+        public required int SpellIndex { get; init; }
+
+        public GameState IncrementSpellIndex() => new()
         {
-            var spell = ChooseSpell(target);
+            PlayerTurn = PlayerTurn,
+            PlayerHp = PlayerHp,
+            PlayerMana = PlayerMana,
+            ManaUsed = ManaUsed,
 
-            if (spell is not null)
-                CastSpell(spell, target);
+            BossHp = BossHp,
 
-            return target.HitPoints <= 0;
-        }
+            TimerShieldEffect = TimerShieldEffect,
+            TimerPoisonEffect = TimerPoisonEffect,
+            TimerRechargeEffect = TimerRechargeEffect,
 
-        private Spell? ChooseSpell(Entity target)
-        {
-            var spells = GetAvailableSpells(target);
-
-            if (!spells.Any())
-                return null;
-
-            var spell = ChooseSpellFromAvailableSpellUsingPlayerInput(spells.ToArray(), this, target);
-
-            return spell;
-        }
-
-        private static Spell ChooseSpellFromAvailableSpellsUsingScore(Spell[] spells, Player player, Entity target)
-        {
-            var spell = spells.OrderByDescending(s => s.Score)
-                .ThenBy(s => s.ManaCost)
-                .FirstOrDefault();
-            return spell!;
-        }
-
-        private static Spell ChooseSpellFromAvailableSpellUsingPlayerInput(Spell[] spells, Player player, Entity target)
-        {
-            for (int i = 0; i < spells.Length; i++)
-                Console.WriteLine($"{i}: {spells[i].Name,15} {spells[i].ManaCost, 5}");
-
-            var spellIndex = int.Parse(Console.ReadLine() ?? "");
-            var spell = spells[spellIndex];
-
-            return spell;
-        }
-
-        private ICollection<Spell> GetAvailableSpells(Entity target)
-        {
-            return s_spells.Where(s => s.ManaCost <= Mana &&
-                (s.CanCast?.Invoke(this, target) ?? true)).ToList();
-        }
-
-        private void CastSpell(Spell spell, Entity target)
-        {
-            if (Mana < spell.ManaCost)
-                throw new InvalidOperationException($"Cannot cast '{spell.Name}'. Not enough mana.");
-
-            Console.WriteLine($"{Name} casts {spell.Name}");
-            spell.Cast(this, target);
-
-            IncreaseMana(-spell.ManaCost);
-            TotalManaSpend += spell.ManaCost;
-        }
-
-        public override bool TakeDamage(int damage)
-        {
-            var damageTaken = damage - Armor;
-            return base.TakeDamage(damageTaken);
-        }
-
-        public override void PrintStats() => Console.WriteLine($"- {Name} has {HitPoints} hit points, {Armor} armor, {Mana} mana");
+            SpellIndex = SpellIndex+1,
+        };
     }
 
-    public class Boss : Entity
-    {
-        public Boss(int hp, int damage) : base("Boss", hp)
-        {
-            Damage = damage;
-        }
-
-        public int Damage { get; }
-
-        public override bool DoAction(Entity target) => target.TakeDamage(Damage);
-    }
-
-    public abstract class Entity
-    {
-        private readonly int _startingHp;
-        private readonly int _startingMana;
-        protected readonly List<Effect> _activeEffects = new();
-
-        public Entity(string name, int hp, int mana = 0)
-        {
-            Name = name;
-            HitPoints = hp;
-            Mana = mana;
-
-            _startingHp = hp;
-            _startingMana = mana;
-        }
-
-        public string Name { get; }
-        public int HitPoints { get; private set; }
-        public int Mana { get; private set; }
-        public int Armor { get; private set; }
-
-        public abstract bool DoAction(Entity target);
-
-        public bool HandleEffects()
-        {
-            foreach (var effect in _activeEffects)
-            {
-                if (effect.EachTurn)
-                {
-                    Console.WriteLine($"{effect.Type} handled");
-                    effect.OnActive(this);
-                }
-                else if (effect.FirstActivation)
-                {
-                    Console.WriteLine($"{effect.Type} handled");
-                    effect.OnActive(this);
-                }
-
-                effect.DecreaseTurns();
-                Console.WriteLine($"{effect.Type} {effect.Turns} turns left");
-
-                if (effect.Turns <= 0)
-                    effect.OnDeactivate?.Invoke(this);
-            }
-
-            _activeEffects.RemoveAll(e => e.Turns <= 0);
-
-            return HitPoints <= 0;
-        }
-
-        /// <summary>
-        /// Decrease hitpoints of the entity.
-        /// </summary>
-        /// <returns>When the entity died returns true; otherwise false.</returns>
-        public virtual bool TakeDamage(int damage)
-        {
-            var damageTaken = damage < 1 ? 1 : damage;
-
-            HitPoints -= damageTaken;
-
-            return HitPoints <= 0;
-        }
-        public void Heal(int hp) => HitPoints += hp;
-        public void IncreaseArmor(int armor) => Armor += armor;
-        public void IncreaseMana(int mana) => Mana += mana;
-
-        public void GiveEffect(Effect effect)
-        {
-            if (HasEffect(effect.Type))
-                throw new InvalidOperationException($"Effect '{effect.Type}' is already active");
-
-            _activeEffects.Add(effect);
-        }
-        public bool HasEffect(EffectType effectType) => _activeEffects.Any(e => e.Type == effectType);
-
-        public virtual void PrintStats() => Console.WriteLine($"- {Name} has {HitPoints} hit points");
-        public virtual void Reset()
-        {
-            HitPoints = _startingHp;
-            Mana = _startingMana;
-            Armor = 0;
-
-            _activeEffects.Clear();
-        }
-    }
-
-    public record Spell(
-        string Name, 
-        int ManaCost, 
-        Action<Entity, Entity> Cast,
-        Func<Entity, Entity, bool>? CanCast = null, 
-        int Score = 0);
-
-    public record Effect(EffectType Type, int Turns, Action<Entity> OnActive, Action<Entity>? OnDeactivate = null, bool EachTurn = true)
-    {
-        private readonly int _startTurns = Turns;
-
-        public int Turns { get; private set; }  = Turns;
-        public int DecreaseTurns() => Turns--;
-        public bool FirstActivation => Turns == _startTurns;
-
-        /// <summary>
-        /// +7 armor when active
-        /// </summary>
-        public static Effect Shield(int turns) => new(EffectType.Shield, turns, e => e.IncreaseArmor(+7), e => e.IncreaseArmor(-7), EachTurn: false);
-
-        /// <summary>
-        /// -3 HP each turn
-        /// </summary>
-        public static Effect Poison(int turns) => new(EffectType.Poison, turns, e => e.TakeDamage(3));
-
-        /// <summary>
-        /// +101 Mana each turn
-        /// </summary>
-        public static Effect Recharge(int turns) => new(EffectType.Recharge, turns, e => e.IncreaseMana(101));
-    }
-
-    public enum EffectType
-    {
-        Shield,
-        Poison,
-        Recharge,
-    }
+    public record Spell(string Name, int ManaCost, Action<Game> Cast, Func<Game, bool>? CanCast = null);
 }
