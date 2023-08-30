@@ -31,10 +31,27 @@ internal class Day24_ItHangsInTheBalance
 
         while (foundCombinations.Count == 0)
         {
-            foundCombinations = FindGroupsWithEqualWeight(_presents, countPresents).ToList();
+            foundCombinations = FindGroupsWithEqualWeight(_presents, countPresents, 3).ToList();
             countPresents++;
         }
 
+
+        var smallest = GetSmallestQuantumEntanglement(foundCombinations);
+
+        Console.WriteLine($"Smallest: {smallest}");
+    }
+
+    [Part(2)]
+    public void Part02()
+    {
+        var foundCombinations = new List<int[]>();
+        var countPresents = 2;
+
+        while (foundCombinations.Count == 0)
+        {
+            foundCombinations = FindGroupsWithEqualWeight(_presents, countPresents, 4).ToList();
+            countPresents++;
+        }
 
         var smallest = GetSmallestQuantumEntanglement(foundCombinations);
 
@@ -66,32 +83,40 @@ internal class Day24_ItHangsInTheBalance
         return smallest ?? ulong.MaxValue;
     }
 
-    private static ICollection<int[]> FindGroupsWithEqualWeight(int[] presents, int countPresentsGrp1)
+    private static ICollection<int[]> FindGroupsWithEqualWeight(int[] presents, int countPresentsFirstGroup, int totalGroups)
     {
         var groupOnesWithEqualSums = new List<int[]>();
 
-        foreach (var group1 in GetFixedLengthCombinations(countPresentsGrp1, presents))
+        foreach (var group1 in GetFixedLengthCombinations(countPresentsFirstGroup, presents))
         {
-            // Create new present pool.
-            var presentPoolGrp2 = CopyAndSubtract(presents, group1);
-
             var sumGrp1 = group1.Sum();
 
-            foreach (var group2 in GetFixedSumCombinations(sumGrp1, presentPoolGrp2.ToArray()))
-            {
-                // Create new present pool.
-                var presentPoolGrp3 = CopyAndSubtract(presentPoolGrp2, group2);
-
-                var sumGrp3 = presentPoolGrp3.Sum();
-
-                if (sumGrp3 == sumGrp1)
-                    groupOnesWithEqualSums.Add(group1);
-
-                break;
-            }
+            if (FindGroups(sumGrp1, totalGroups - 1, presents, group1))
+                groupOnesWithEqualSums.Add(group1);
         }
 
         return groupOnesWithEqualSums;
+    }
+
+    private static bool FindGroups(int sumFirstGroup, int groupNum, int[] presents, int[] presentsPreviousGroup)
+    {
+        var newPresentsPool = CopyAndSubtract(presents, presentsPreviousGroup);
+
+        if (groupNum == 1)
+        {
+            var sum = newPresentsPool.Sum();
+            if (sum == sumFirstGroup)
+                return true;
+        }
+        else
+        {
+            foreach (var group in GetFixedSumCombinations(sumFirstGroup, newPresentsPool))
+            {
+                return FindGroups(sumFirstGroup, groupNum - 1, newPresentsPool, group);
+            }
+        }
+
+        return false;
     }
 
     private static int[] CopyAndSubtract(int[] src, int[] dst)
