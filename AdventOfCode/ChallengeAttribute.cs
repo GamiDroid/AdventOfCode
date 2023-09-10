@@ -5,26 +5,23 @@ namespace AdventOfCode;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public class ChallengeAttribute : Attribute
 {
-    public ChallengeAttribute(int year, int day)
+    public ChallengeAttribute(int year, int day, string? title = null)
     {
         Year = year;
         Day = day;
+        Title = title;
     }
 
     public int Year { get; set; }
     public int Day { get; set; }
+    public string? Title { get; set; }
 
-    public static IDictionary<ChallengeAttribute, Type> GetChallenges()
+    public static IDictionary<ChallengeAttribute, TypeInfo> GetChallenges()
     {
-        var challengeTypes = Assembly.GetAssembly(typeof(ChallengeAttribute))!.DefinedTypes
+        var challenges = Assembly.GetAssembly(typeof(ChallengeAttribute))!.DefinedTypes
             .Where(t => t.CustomAttributes.Any(a => a.AttributeType == typeof(ChallengeAttribute)))
             .Select(t => new { Type = t, Attribute = t.GetCustomAttribute<ChallengeAttribute>()! })
-            .ToList();
-
-        var challenges = new Dictionary<ChallengeAttribute, Type>();
-
-        foreach (var challengeType in challengeTypes)
-            challenges[challengeType.Attribute] = challengeType.Type;
+            .ToDictionary(c => c.Attribute, c => c.Type);
 
         return challenges;
     }

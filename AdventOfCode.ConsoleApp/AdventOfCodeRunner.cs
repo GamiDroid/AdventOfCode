@@ -24,21 +24,25 @@ internal static class AdventOfCodeRunner
             day = ChooseDay(year);
         }
 
-        var challengeType = _challenges.Where(c => c.Key.Year == year && c.Key.Day == day).Select(c => c.Value).FirstOrDefault();
+        var challengeType = s_challenges.Where(c => c.Key.Year == year && c.Key.Day == day).Select(c => c.Value).FirstOrDefault();
         if (challengeType is not null)
         {
             RunParts(challengeType);
         }
     }
 
-    private static IDictionary<ChallengeAttribute, Type> _challenges = ChallengeAttribute.GetChallenges();
+    private static readonly IDictionary<ChallengeAttribute, TypeInfo> s_challenges = ChallengeAttribute.GetChallenges();
 
     private static int ChooseDay(int year)
     {
         int day = 0;
-        foreach (var challenge in _challenges.Where(c => c.Key.Year == year))
+        foreach (var challenge in s_challenges.Where(c => c.Key.Year == year))
         {
-            Console.WriteLine($"{challenge.Key.Year} {challenge.Key.Day} : {challenge.Value.Name}");
+            var challengeTitle = challenge.Key.Title;
+            if (string.IsNullOrWhiteSpace(challengeTitle))
+                challengeTitle = challenge.Value.Name;
+
+            Console.WriteLine($"{challenge.Key.Year} --- Day {challenge.Key.Day}: {challengeTitle}");
             day = challenge.Key.Day;
         }
 
@@ -56,7 +60,7 @@ internal static class AdventOfCodeRunner
 
             if (int.TryParse(input, out day))
             {
-                var challenge = _challenges.Where(c => c.Key.Year == year && c.Key.Day == day).Select(c => c.Value).FirstOrDefault();
+                var challenge = s_challenges.Where(c => c.Key.Year == year && c.Key.Day == day).Select(c => c.Value).FirstOrDefault();
                 if (challenge != null)
                 {
                     break;
@@ -69,7 +73,7 @@ internal static class AdventOfCodeRunner
 
     private static int ChooseYear()
     {
-        var years = _challenges.Select(c => c.Key.Year).Distinct();
+        var years = s_challenges.Select(c => c.Key.Year).Distinct();
 
         Console.WriteLine($"Years: {string.Join(", ", years)}");
 
@@ -119,43 +123,6 @@ internal static class AdventOfCodeRunner
             Console.WriteLine($"Executing part {part.PartAttribute.Number} '{part.MethodInfo.Name}'...\n");
 
             part.MethodInfo.Invoke(instance, null);
-        }
-    }
-
-    private static void RunParts<T>() where T : class, new()
-    {
-        var partMethods = typeof(T).GetMethods()
-            .Where(mi => mi.CustomAttributes.Any(a => a.AttributeType == typeof(PartAttribute)))
-            .Select(mi => new { MethodInfo = mi, PartAttribute = mi.GetCustomAttribute<PartAttribute>()! })
-            .OrderBy(ma => ma.PartAttribute.Number)
-            .ToList();
-
-        if (!partMethods.Any())
-            Console.WriteLine("There are no Advent of Code parts found to execute.");
-
-        var firstSetupMethod = typeof(T).GetMethods()
-            .Where(mi => mi.CustomAttributes.Any(a => a.AttributeType == typeof(SetupAttribute)))
-            .FirstOrDefault();
-
-        Console.WriteLine($"Executing parts for {typeof(T).Name}:");
-
-        var instance = Activator.CreateInstance<T>();
-
-        if (firstSetupMethod is not null)
-        {
-            Console.WriteLine($"Executing setup '{firstSetupMethod.Name}'...\n");
-            firstSetupMethod.Invoke(instance, null);
-        }
-
-        foreach (var part in partMethods)
-        {
-            Console.WriteLine($"Executing part {part.PartAttribute.Number} '{part.MethodInfo.Name}'...\n");
-
-            T? ins = null;
-            if (!part.MethodInfo.IsStatic)
-                ins = instance;
-
-            part.MethodInfo.Invoke(ins, null);
         }
     }
 }

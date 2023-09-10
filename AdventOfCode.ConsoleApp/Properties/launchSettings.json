@@ -2,7 +2,7 @@
   "profiles": {
     "AdventOfCode.ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "--year 2015"
+      "commandLineArgs": "--year 2016"
     }
   }
 }
