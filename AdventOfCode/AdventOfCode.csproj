@@ -9,5 +9,9 @@
   <ItemGroup>
 	<InternalsVisibleTo Include="AdventOfCode.Tests" />
   </ItemGroup>
+   
+  <ItemGroup>
+    <Folder Include="2016\Resources\" />
+  </ItemGroup>
 
 </Project>
