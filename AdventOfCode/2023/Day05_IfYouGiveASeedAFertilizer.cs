@@ -52,18 +52,45 @@ internal class Day05_IfYouGiveASeedAFertilizer
         foreach (var seed in _seeds)
         {
             Console.WriteLine("getting location for seed {0}", seed);
-            var number = seed;
-            foreach (var map in _maps)
-            {
-                number = GetDestination(number, map);
-                Console.Write($"{number} ");
-            }
+            var location = GetLocationForSeed(seed);
 
-            Console.WriteLine("location is {0}", number);
-            lowestLocation = (number < lowestLocation) ? number : lowestLocation;
+            Console.WriteLine("location is {0}", location);
+            lowestLocation = (location < lowestLocation) ? location : lowestLocation;
         }
 
         Console.WriteLine("Anwser for part 1 is {0}", lowestLocation);
+    }
+
+    [Part(2)]
+    public void Part02()
+    {
+        var lowestLocation = ulong.MaxValue;
+        for (int i = 0; i < _seeds.Length; i++)
+        {
+            var start = _seeds[i];
+            var length = _seeds[++i];
+            var end = start + (length-1);
+
+            Console.WriteLine($"start {start}, length {length}, end {end}");
+
+            for (var y = start; y <= end; y++)
+            {
+                var location = GetLocationForSeed(y);
+                lowestLocation = (location < lowestLocation) ? location : lowestLocation;
+            }
+        }
+
+        Console.WriteLine("lowest: {0}", lowestLocation);
+    }
+
+    public ulong GetLocationForSeed(ulong seed)
+    {
+        var number = seed;
+        foreach (var map in _maps)
+        {
+            number = GetDestination(number, map);
+        }
+        return number;
     }
 
     public static Converter Parse(string input)
