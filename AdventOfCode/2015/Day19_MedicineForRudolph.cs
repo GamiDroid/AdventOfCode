@@ -9,11 +9,10 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 19)]
 internal class Day19_MedicineForRudolph
 {
-    private ICollection<(string, string)> _replacements = Enumerable.Empty<(string, string)>().ToList();
-    private string _molecule = default!;
+    private readonly ICollection<(string, string)> _replacements;
+    private readonly string _molecule;
 
-    [Setup]
-    public void Setup()
+    public Day19_MedicineForRudolph()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);

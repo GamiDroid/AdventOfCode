@@ -5,10 +5,9 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 23)]
 internal class Day23_OpeningTheTuringLock
 {
-    private IInstruction[] _instructions = Array.Empty<IInstruction>();
+    private readonly IInstruction[] _instructions;
 
-    [Setup]
-    public void Setup()
+    public Day23_OpeningTheTuringLock()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);

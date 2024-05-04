@@ -11,10 +11,9 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 17)]
 internal class Day17_NoSuchThingAsTooMuch
 {
-    private int[] _containerSizes = Array.Empty<int>();
+    private readonly int[] _containerSizes;
 
-    [Setup]
-    public void Setup()
+    public Day17_NoSuchThingAsTooMuch()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);

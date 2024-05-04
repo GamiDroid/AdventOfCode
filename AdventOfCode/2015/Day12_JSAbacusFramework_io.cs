@@ -7,10 +7,9 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 12)]
 internal class Day12_JSAbacusFramework_io
 {
-    private string? _input;
+    private readonly string _input;
 
-    [Setup]
-    public void Setup()
+    public Day12_JSAbacusFramework_io()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         _input = File.ReadAllText(filePath);

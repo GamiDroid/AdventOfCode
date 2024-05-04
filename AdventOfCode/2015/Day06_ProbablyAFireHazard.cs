@@ -7,8 +7,10 @@ internal partial class Day06_ProbablyAFireHazard
 {
     private Action[] _testData = default!;
 
-    [Setup]
-    public void Setup() => _testData = GetTestData();
+    public Day06_ProbablyAFireHazard()
+    {
+        _testData = GetTestData();
+    }
 
     [Part(1)]
     public void ExecutePart01()

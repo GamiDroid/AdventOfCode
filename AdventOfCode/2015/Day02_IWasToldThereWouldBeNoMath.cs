@@ -3,10 +3,12 @@
 [Challenge(2015, 2)]
 internal class Day02_IWasToldThereWouldBeNoMath
 {
-    private BoxDimentions[] _testData = default!;
+    private readonly BoxDimentions[] _testData;
 
-    [Setup]
-    public void Setup() => _testData = GetTestData();
+    public Day02_IWasToldThereWouldBeNoMath()
+    {
+        _testData = GetTestData();
+    }
 
     [Part(1)]
     public void ExecutePart01()

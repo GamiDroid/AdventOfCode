@@ -3,10 +3,9 @@
 [Challenge(2015, 5)]
 internal class Day05_DoesntHeHaveInternElvesForThis
 {
-    private string[] _testData = default!;
+    private readonly string[] _testData;
 
-    [Setup]
-    public void Setup()
+    public Day05_DoesntHeHaveInternElvesForThis()
     {
         _testData = GetTestData();
     }

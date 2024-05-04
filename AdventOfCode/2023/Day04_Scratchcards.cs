@@ -5,10 +5,9 @@ using System.Text.RegularExpressions;
 [Challenge(2023, 4, "Scratchcards")]
 public class Day04_Scratchcards
 {
-    readonly ICollection<Scratchcard> _scratchcards = new List<Scratchcard>();
+    readonly List<Scratchcard> _scratchcards = [];
 
-    [Setup]
-    public void Setup()
+    public Day04_Scratchcards()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);

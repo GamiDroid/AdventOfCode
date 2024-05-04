@@ -37,11 +37,3 @@ public class PartAttribute : Attribute
 
     public int Number { get; init; }
 }
-
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-public class SetupAttribute : Attribute
-{
-    public SetupAttribute()
-    {
-    }
-}

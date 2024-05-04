@@ -5,10 +5,9 @@ namespace AdventOfCode._2023;
 [Challenge(2023, 1, "Trebuchet?!")]
 public class Day01_Trebuchet
 {
-    private string[] _lines = Array.Empty<string>();
+    private readonly string[] _lines;
 
-    [Setup]
-    public void Setup()
+    public Day01_Trebuchet()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         _lines = File.ReadAllLines(filePath);

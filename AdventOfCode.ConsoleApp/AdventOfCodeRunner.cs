@@ -104,25 +104,18 @@ internal static class AdventOfCodeRunner
         if (!partMethods.Any())
             Console.WriteLine("There are no Advent of Code parts found to execute.");
 
-        var firstSetupMethod = type.GetMethods()
-            .Where(mi => mi.CustomAttributes.Any(a => a.AttributeType == typeof(SetupAttribute)))
-            .FirstOrDefault();
-
         Console.WriteLine($"Executing parts for {type.Name}:");
-
-        var instance = Activator.CreateInstance(type);
-
-        if (firstSetupMethod is not null)
-        {
-            Console.WriteLine($"Executing setup '{firstSetupMethod.Name}'...\n");
-            firstSetupMethod.Invoke(instance, null);
-        }
 
         foreach (var part in partMethods)
         {
+            var instance = Activator.CreateInstance(type);
+
             Console.WriteLine($"Executing part {part.PartAttribute.Number} '{part.MethodInfo.Name}'...\n");
 
-            part.MethodInfo.Invoke(instance, null);
+            var result = part.MethodInfo.Invoke(instance, null);
+
+            if (result is not null)
+                Console.WriteLine($"Puzzle result: {result}");
         }
     }
 }

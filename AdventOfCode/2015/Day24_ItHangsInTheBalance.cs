@@ -5,10 +5,9 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 24)]
 internal class Day24_ItHangsInTheBalance
 {
-    private int[] _presents = Array.Empty<int>(); 
+    private readonly int[] _presents;
 
-    [Setup]
-    public void Setup()
+    public Day24_ItHangsInTheBalance()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);

@@ -10,14 +10,6 @@ internal class Day15_ScienceForHungryPeople
 {
     private Ingredient[] _ingredients = Array.Empty<Ingredient>();
 
-    [Setup]
-    public void Setup()
-    {
-        var filePath = ChallengeHelper.GetResourceFilePath();
-        var text = File.ReadAllText(filePath);
-        _ingredients = GetIngredients(text);
-    }
-
     private static Ingredient[] GetIngredients(string text)
     {
         var ingredients = new List<Ingredient>();

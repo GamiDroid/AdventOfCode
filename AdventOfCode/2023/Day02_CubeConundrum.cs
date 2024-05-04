@@ -5,10 +5,9 @@ namespace AdventOfCode._2023;
 [Challenge(2023, 2, "Cube Conundrum")]
 internal class Day02_CubeConundrum
 {
-    private Dictionary<int, Game[]> _gameCubes = new();
+    private readonly Dictionary<int, Game[]> _gameCubes = [];
 
-    [Setup]
-    public void Setup()
+    public Day02_CubeConundrum()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);

@@ -12,11 +12,13 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 9)]
 internal class Day09_AllInASingleNight
 {
-    private TravelMap _map = null!;
+    private readonly TravelMap _map;
 
-    [Setup]
-    public void Setup() => _map = GetTravelMap();
-    
+    public Day09_AllInASingleNight()
+    {
+        _map = GetTravelMap();
+    }
+   
     [Part(1)]
     public void ExecutePart01()
     {

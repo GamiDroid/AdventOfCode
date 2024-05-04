@@ -10,10 +10,9 @@ namespace AdventOfCode._2023;
 [Challenge(2023, 3, "Gear Ratios")]
 internal class Day03_GearRatios
 {
-    private string[] _lines = Array.Empty<string>();
+    private readonly string[] _lines;
 
-    [Setup]
-    public void Setup()
+    public Day03_GearRatios()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         _lines = File.ReadAllLines(filePath);

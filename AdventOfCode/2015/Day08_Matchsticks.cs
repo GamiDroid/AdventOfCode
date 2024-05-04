@@ -6,10 +6,12 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 8)]
 internal class Day08_Matchsticks
 {
-    private string? _testData;
+    private readonly string? _testData;
 
-    [Setup]
-    public void Setup() => _testData = GetTestData();
+    public Day08_Matchsticks()
+    {
+        _testData = GetTestData();
+    }
 
     [Part(1)]
     public void ExecutePart01()

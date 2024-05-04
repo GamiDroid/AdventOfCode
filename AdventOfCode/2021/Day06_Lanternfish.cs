@@ -3,10 +3,12 @@
 [Challenge(2021, 6)]
 public class Day06_Lanternfish
 {
-    private string? _testData;
+    private readonly string _testData;
 
-    [Setup]
-    public void Setup() => _testData = GetTestData();
+    public Day06_Lanternfish()
+    {
+        _testData = GetTestData();
+    }
 
     [Part(1)]
     public void ExecutePart01()

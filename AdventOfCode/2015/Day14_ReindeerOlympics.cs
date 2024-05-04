@@ -10,10 +10,9 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 14)]
 internal class Day14_ReindeerOlympics
 {
-    private string[] _lines = new string[0];
+    private readonly string[] _lines;
 
-    [Setup]
-    public void Setup()
+    public Day14_ReindeerOlympics()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         _lines = File.ReadAllLines(filePath);

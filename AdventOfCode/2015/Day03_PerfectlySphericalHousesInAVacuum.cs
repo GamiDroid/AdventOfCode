@@ -3,10 +3,12 @@
 [Challenge(2015, 3)]
 internal class Day03_PerfectlySphericalHousesInAVacuum
 {
-    private string _testData = string.Empty;
+    private readonly string _testData;
 
-    [Setup]
-    public void Setup() => _testData = GetTestData();
+    public Day03_PerfectlySphericalHousesInAVacuum()
+    {
+        _testData = GetTestData();
+    }
 
     [Part(1)]
     public void ExecutePart01()

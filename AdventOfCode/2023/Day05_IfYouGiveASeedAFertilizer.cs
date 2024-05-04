@@ -5,11 +5,10 @@ namespace AdventOfCode._2023;
 [Challenge(2023, 5, "If You Give A Seed A Fertilizer")]
 internal class Day05_IfYouGiveASeedAFertilizer
 {
-    private ulong[] _seeds = [];
+    private readonly ulong[] _seeds;
     private readonly List<Converter[]> _maps = [];
 
-    [Setup]
-    public void Setup()
+    public Day05_IfYouGiveASeedAFertilizer()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);

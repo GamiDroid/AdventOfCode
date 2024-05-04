@@ -26,10 +26,9 @@ internal class Day07_CamelCards
     // each hand wins {hand rank} * {bid}. starting with 1
     // Result : total winnings
 
-    private List<HandBid>? _handBids;
+    private readonly List<HandBid>? _handBids;
 
-    [Setup]
-    public void Setup()
+    public Day07_CamelCards()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var fileContent = File.ReadAllText(filePath);

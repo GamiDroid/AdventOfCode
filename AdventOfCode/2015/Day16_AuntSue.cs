@@ -6,10 +6,9 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 16)]
 internal class Day16_AuntSue
 {
-    public AuntSue[] _auntSues = Array.Empty<AuntSue>();
+    public readonly AuntSue[] _auntSues;
 
-    [Setup]
-    public void Setup()
+    public Day16_AuntSue()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var text = File.ReadAllText(filePath);

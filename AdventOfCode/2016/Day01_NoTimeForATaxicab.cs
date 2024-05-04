@@ -10,10 +10,9 @@ namespace AdventOfCode._2016;
 [Challenge(2016, 1, "No Time for a Taxicab")]
 internal class Day01_NoTimeForATaxicab
 {
-    private ICollection<Instruction>? _instructions;
+    private readonly ICollection<Instruction>? _instructions;
 
-    [Setup]
-    public void Setup()
+    public Day01_NoTimeForATaxicab()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var fileContent = File.ReadAllText(filePath);

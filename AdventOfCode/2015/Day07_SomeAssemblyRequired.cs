@@ -5,10 +5,12 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 7)]
 internal class Day07_SomeAssemblyRequired
 {
-    private string[] _testData = default!;
+    private readonly string[] _testData = default!;
 
-    [Setup]
-    public void Setup() => _testData = GetTestData();
+    public Day07_SomeAssemblyRequired()
+    {
+        _testData = GetTestData();
+    }
 
     [Part(1)]
     public void ExecutePart01()

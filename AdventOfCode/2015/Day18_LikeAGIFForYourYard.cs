@@ -5,10 +5,9 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 18)]
 internal class Day18_LikeAGIFForYourYard
 {
-    private Lights _lights = new(0, 0);
+    private readonly Lights _lights;
 
-    [Setup]
-    public void Setup()
+    public Day18_LikeAGIFForYourYard()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);

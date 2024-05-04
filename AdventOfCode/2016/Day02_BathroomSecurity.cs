@@ -2,7 +2,7 @@
 [Challenge(2016, 2, "Bathroom Security")]
 internal class Day02_BathroomSecurity
 {
-    private string[] _lines = Array.Empty<string>();
+    private readonly string[] _lines;
 
     private static readonly int[,] s_numberGrid = new[,]
     {
@@ -20,8 +20,7 @@ internal class Day02_BathroomSecurity
         { 'X', 'X', 'D', 'X', 'X' },
     };
 
-    [Setup]
-    public void Setup()
+    public Day02_BathroomSecurity()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         var lines = File.ReadAllLines(filePath);

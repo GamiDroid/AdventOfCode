@@ -3,10 +3,12 @@
 [Challenge(2015, 1)]
 internal class Day01_NotQuiteLisp
 {
-    private string _testData = string.Empty;
+    private readonly string _testData;
 
-    [Setup]
-    public void Setup() => _testData = GetTestData();
+    public Day01_NotQuiteLisp()
+    {
+        _testData = GetTestData();
+    }
 
     [Part(1)]
     public void ExecutePart01()

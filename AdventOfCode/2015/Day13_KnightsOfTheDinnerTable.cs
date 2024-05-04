@@ -12,10 +12,9 @@ namespace AdventOfCode._2015;
 [Challenge(2015, 13)]
 internal class Day13_KnightsOfTheDinnerTable
 {
-    private string? _testData;
+    private readonly string _testData;
 
-    [Setup]
-    public void Setup()
+    public Day13_KnightsOfTheDinnerTable()
     {
         var filePath = ChallengeHelper.GetResourceFilePath();
         _testData = File.ReadAllText(filePath);
