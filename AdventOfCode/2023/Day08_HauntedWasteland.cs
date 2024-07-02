@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static AdventOfCode._2015.Day23_OpeningTheTuringLock;
+﻿using System.Text.RegularExpressions;
 
 namespace AdventOfCode._2023;
 [Challenge(2023, 8, "Haunted Wasteland")]
