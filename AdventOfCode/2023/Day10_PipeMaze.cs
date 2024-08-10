@@ -24,10 +24,10 @@ internal class Day10_PipeMaze
     public void Part01()
     {
         var startPoint = GetStartPoint();
+        var state = new State(startPoint);
 
         var points = GetNextPossiblePoints(startPoint);
-
-        var state = new State(points[0], startPoint, 1);
+        state.Move(points[0]);
 
         bool isBackToStart = false;
         while (!isBackToStart)
@@ -107,9 +107,133 @@ internal class Day10_PipeMaze
         if (point.X < 0 || point.Y < 0 ||
             point.X >= _maze.GetLength(0) ||
             point.Y >= _maze.GetLength(1))
-            return '.';
+            return '#';
 
         return _maze[point.X, point.Y];
+    }
+
+
+    [Part(2)]
+    public void Part02()
+    {
+        var islands = FindGroundIslands();
+
+        // use THE SHOELACE ALGORITHM to find the area inside the pipe maze.
+        // https://www.101computing.net/the-shoelace-algorithm/
+
+        var startPoint = GetStartPoint();
+
+        var state = new State(startPoint);
+
+        var vertices = FindVertices(startPoint, ref state);
+        var area = CalculateArea(vertices);
+
+        // use PICK'S THEOREM to find the interior points inside the lace.
+        // https://en.wikipedia.org/wiki/Pick%27s_theorem
+        // A = i + b/2 − 1
+        // A = area
+        // i = iterior points
+        // b = boundry points
+        // i = A - b/2 - 1
+
+        var interiorPoints = area - (state.Steps / 2) + 1;
+
+        Console.WriteLine($"interior points: {interiorPoints}");
+    }
+
+    private int CalculateArea(Point[] vertices)
+    {
+        int sum1 = 0, sum2 = 0;
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            int i2 = i + 1;
+            if (i2 == vertices.Length)
+                i2 = 0;
+
+            sum1 += vertices[i].X * vertices[i2].Y;
+            sum2 += vertices[i].Y * vertices[i2].X;
+        }
+
+        var area = Math.Abs(sum1 - sum2) / 2;
+
+        return area;
+    }
+
+    private Point[] FindVertices(Point startPoint, ref State state)
+    {
+        List<Point> vertices = [];
+
+        var points = GetNextPossiblePoints(state.CurrentPoint);
+
+        // check if startPoint is a vertices
+        if (points[0].X != points[1].X && points[0].Y != points[1].Y)
+            vertices.Add(state.CurrentPoint);
+
+        state.Move(points[0]);
+
+        while (true)
+        {
+            var currentTile = GetTile(state.CurrentPoint);
+            if (currentTile is 'L' or 'F' or 'J' or '7')
+                vertices.Add(state.CurrentPoint);
+
+            var nextPoint = GetNextPoint(state);
+            state.Move(nextPoint);
+
+            if (nextPoint == startPoint)
+            {
+                break;
+            }
+        }
+
+        return [.. vertices];
+    }
+
+    private Point[][] FindGroundIslands()
+    {
+        List<Point[]> islands = [];
+        HashSet<Point> visitedGrounds = [];
+
+        var yLength = _maze.GetLength(1);
+        var xLength = _maze.GetLength(0);
+
+        for (int y = 0; y < yLength; y++)
+        {
+            for (int x = 0; x < xLength; x++)
+            {
+                if (visitedGrounds.Contains(new Point(x, y)))
+                    continue;
+
+                if (_maze[x, y].Equals('.'))
+                {
+                    HashSet<Point> island = [];
+                    GetIsland(new Point(x, y), island, visitedGrounds);
+                    islands.Add([.. island]);
+                }
+            }
+        }
+
+        return [.. islands];
+    }
+
+    private void GetIsland(Point point, HashSet<Point> island, HashSet<Point> visited)
+    {
+        if (!visited.Add(point))
+            return;
+
+        island.Add(point);
+
+        Point[] neigbors = [
+            point.GetNorth(), 
+            point.GetEast(), 
+            point.GetSouth(), 
+            point.GetWest()];
+
+        foreach (var neigbor in neigbors)
+        {
+            if (GetTile(neigbor) == '.')
+                GetIsland(neigbor, island, visited);
+        }
     }
 
     private record struct Point(int X, int Y)
@@ -120,14 +244,11 @@ internal class Day10_PipeMaze
         public readonly Point GetWest() => new(X - 1, Y);
     }
 
-    private class State(
-        Point currentPoint, 
-        Point previousPoint, 
-        int steps)
+    private class State(Point currentPoint)
     {
         public Point CurrentPoint { get; private set; } = currentPoint;
-        public Point PreviousPoint { get; private set; } = previousPoint;
-        public int Steps { get; private set; } = steps;
+        public Point PreviousPoint { get; private set; }
+        public int Steps { get; private set; }
 
         public void Move(Point nextPoint)
         {
