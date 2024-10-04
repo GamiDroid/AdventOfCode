@@ -12,9 +12,9 @@ public class ChallengeAttribute : Attribute
         Title = title;
     }
 
-    public int Year { get; set; }
-    public int Day { get; set; }
-    public string? Title { get; set; }
+    public int Year { get; }
+    public int Day { get; }
+    public string? Title { get; }
 
     public static IDictionary<ChallengeAttribute, TypeInfo> GetChallenges()
     {
