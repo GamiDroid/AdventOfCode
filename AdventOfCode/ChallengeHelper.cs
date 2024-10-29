@@ -21,6 +21,19 @@ internal class ChallengeHelper
         }
     }
 
+    public static string ReadAllTextFromResourceFile([CallerFilePath] string callerFilePath = "")
+    {
+        try
+        {
+            var inputPath = GetChallengeResourceFilePath(callerFilePath);
+            return File.ReadAllText(inputPath);
+        }
+        catch (IOException)
+        {
+            throw new InvalidOperationException("Resource file is just created. Add content!!!");
+        }
+    }
+
     private static string GetChallengeResourceFilePath(string challengeFilePath)
     {
         var challengeName = Path.GetFileNameWithoutExtension(challengeFilePath)?.Split("_")[1];
