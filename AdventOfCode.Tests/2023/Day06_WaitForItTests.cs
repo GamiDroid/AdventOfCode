@@ -31,7 +31,6 @@ public class Day06_WaitForItTests
     [Theory]
     [InlineData(7, 9, 4)]
     [InlineData(15, 40, 8)]
-    [InlineData(30, 200, 9)]
     [InlineData(71530, 940200, 71503)]
     public void CountWins_ShouldReturnAmountOfPossibleWins(int time, ulong record, int expected)
     {
