@@ -23,30 +23,53 @@ internal class Day12_HotSprings
     [Part(1)]
     public void Part01()
     {
-        var sum = _springRecords.Sum(r => FindAmountOfDifferentArrangements(r.Springs, r.Groups));
+        var sum = _springRecords.Sum(r => FindAmountOfDifferentArrangements(r.Springs, r.Groups, out _));
         Console.WriteLine($"Sum of diffent arrangements is {sum}");
     }
 
     [Part(2)]
     public void Part02()
     {
-        var sum = _springRecords
-            .Select(x => (Springs: string.Join("?", Enumerable.Repeat(x.Springs, 5)), Groups: Enumerable.Repeat(x.Groups, 5).SelectMany(x => x).ToArray()))
-            .Sum(x => FindAmountOfDifferentArrangements(x.Springs, x.Groups));
-        Console.WriteLine($"Sum of diffent arrangements is {sum}");
+        long sum = 0;
+        foreach (var (spring, groups) in _springRecords.Select(x => (x.Springs, x.Groups)))
+        {
+            long temp = 1;
+            string prev= "?", next = "?";
+            for (int i = 1; i <= 5; i++)
+            {
+                if (i == 1) prev = "";
+                if (i == 5) next = "";
+
+                var springSolve = prev + spring + next;
+                var different = FindAmountOfDifferentArrangements(springSolve, groups, out string newSprings);
+                prev = newSprings[^1].ToString();
+
+                temp *= different;
+            }
+
+            sum += temp;
+        }
+
+        Console.WriteLine($"Sum: {sum}");
     }
 
-    internal static int FindAmountOfDifferentArrangements(string springs, int[] groups)
+    internal static long FindAmountOfDifferentArrangements(string springs, int[] groups, out string newSprings)
     {
         int springsCount = springs.Length;
         int minimumSpringsNeeded = groups.Sum() + groups.Length - 1;
 
         if (springsCount == minimumSpringsNeeded)
+        {
+            newSprings = new(springs);
             return 1;
+        }
 
         var damagedSpringsCount = springs.Count(x => x == '#');
         if (damagedSpringsCount == groups.Sum())
+        {
+            newSprings = springs.Replace('?', '.');
             return 1;
+        }
 
         SpringSolver solver = new(springs, groups);
 
@@ -55,43 +78,33 @@ internal class Day12_HotSprings
         {
             solvedSpring = false;
 
-            Console.WriteLine($"{string.Join(',', groups)}: ");
-            Console.WriteLine($" {solver.GetSprings()}");
-
-            Console.WriteLine("left to right:");
             solvedSpring = solvedSpring || solver.TrySolveLeftToRight();
-            Console.WriteLine($"- {solver.GetSprings()}");
-
-            Console.WriteLine("right to left :");
             solvedSpring = solvedSpring || solver.TrySolveRightToLeft();
-            Console.WriteLine($"+ {solver.GetSprings()}");
+            
+            solver.TrySolveLargestGroups();
 
         } while (solvedSpring);
 
-        springs = solver.GetSprings();
+        newSprings = springs = solver.GetSprings();
         groups = solver.GetGroups();
 
         damagedSpringsCount = springs.Count(x => x == '#');
         var damagedSpringsMissingCount = groups.Sum() - damagedSpringsCount;
         var unknownSpringLocations = Regex.Matches(springs, "\\?").Select(m => m.Index).ToArray();
 
-        Console.WriteLine("Force solve!");
-
         List<List<int>> combinations = [];
         FindCombinations(unknownSpringLocations, damagedSpringsMissingCount, ref combinations);
 
-        int matches = 0;
+        long matches = 0;
         foreach (var combination in combinations)
         {
-            var newSprings = SetSprings(springs, combination, '#');
-            var ranges = FindDamagedSpringGroups(newSprings).Select(x => x.Length).ToArray();
+            var tempSprings = SetSprings(springs, combination, '#');
+            var ranges = FindDamagedSpringGroups(tempSprings).Select(x => x.Length).ToArray();
             if (groups.SequenceEqual(ranges))
             {
                 matches++;
             }
         }
-
-        Console.WriteLine($"{springs} {string.Join(',', groups)} - {matches}");
 
         return matches;
     }
@@ -160,20 +173,21 @@ internal class Day12_HotSprings
         public void TrySolveLargestGroups()
         {
             var damagedGroups = FindDamagedSpringGroups(new(_springs));
-            foreach (var gl in _groups.Distinct().OrderDescending())
-            {
-                bool hasFound = false;
 
-                foreach (var g in damagedGroups.Where(x => x.Length == gl))
+            var groupsDescending = _groups.GroupBy(x => x, (k, c) => (Group: k, Count: c.Count())).OrderByDescending(x => x.Group).ToList();
+
+            foreach (var gl in groupsDescending)
+            {
+                var damagedGroupsWithLengthX = damagedGroups.Where(x => x.Length == gl.Group).ToList();
+
+                foreach (var g in damagedGroupsWithLengthX)
                 {
-                    hasFound = true;
-                    RangeSet(_springs, g.Start-1, g.End+1, '.');
+                    RangeSet(_springs, g.Start-1, g.Start-1, '.');
+                    RangeSet(_springs, g.End+1, g.End+1, '.');
                 }
 
-                if (!hasFound)
+                if (damagedGroupsWithLengthX.Count != gl.Count)
                     break;
-
-                _groups.RemoveAll(x => x == gl);
             }
         }
 
