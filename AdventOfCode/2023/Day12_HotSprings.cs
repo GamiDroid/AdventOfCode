@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace AdventOfCode._2023;
 
@@ -23,51 +22,87 @@ internal class Day12_HotSprings
     [Part(1)]
     public void Part01()
     {
-        var sum = _springRecords.Sum(r => FindAmountOfDifferentArrangements(r.Springs, r.Groups, out _));
+        var sum = _springRecords.Sum(r => FindAmountOfDifferentArrangements(r.Springs, r.Groups));
         Console.WriteLine($"Sum of diffent arrangements is {sum}");
     }
 
     [Part(2)]
     public void Part02()
     {
-        long sum = 0;
-        foreach (var (spring, groups) in _springRecords.Select(x => (x.Springs, x.Groups)))
+        var sum = _springRecords.Select(x => new
         {
-            long temp = 1;
-            string prev= "?", next = "?";
-            for (int i = 1; i <= 5; i++)
-            {
-                if (i == 1) prev = "";
-                if (i == 5) next = "";
+            Springs = string.Join('?', Enumerable.Repeat(x.Springs, 5)),
+            Groups = Enumerable.Repeat(x.Groups, 5).SelectMany(x => x).ToArray()
+        })
+        .Sum(r => FindAmountOfDifferent(r.Springs, r.Groups));
 
-                var springSolve = prev + spring + next;
-                var different = FindAmountOfDifferentArrangements(springSolve, groups, out string newSprings);
-                prev = newSprings[^1].ToString();
-
-                temp *= different;
-            }
-
-            sum += temp;
-        }
-
-        Console.WriteLine($"Sum: {sum}");
+        Console.WriteLine($"Sum of diffent arrangements is {sum}");
     }
 
-    internal static long FindAmountOfDifferentArrangements(string springs, int[] groups, out string newSprings)
+    internal static long FindAmountOfDifferent(string springs, int[] groups)
+    {
+        Dictionary<(int, int), long> permutations = [];
+        permutations.Add((0, 0), 1);
+        foreach (var c in springs)
+        {
+            List<(int, int, long)> next = [];
+            foreach (var (key, perm_count) in permutations)
+            {
+                var (group_id, group_amount) = key;
+                if (c != '#')
+                {
+                    if (group_amount == 0)
+                    {
+                        next.Add((group_id, group_amount, perm_count));
+                    }
+                    else if (group_amount == groups[group_id])
+                    {
+                        next.Add((group_id + 1, 0, perm_count));
+                    }
+                }
+                if (c != '.')
+                {
+                    if (group_id < groups.Length && group_amount < groups[group_id])
+                    {
+                        next.Add((group_id, group_amount + 1, perm_count));
+                    }
+                }
+            }
+
+            permutations.Clear();
+
+            foreach (var (group_id, group_amount, perm_count) in next)
+            {
+                permutations.TryAdd((group_id, group_amount), 0);
+                permutations[(group_id, group_amount)] += perm_count;
+            }
+
+        }
+
+        return permutations.Where(x => IsValid(groups, x.Key.Item1, x.Key.Item2)).Sum(x => x.Value);
+    }
+
+    internal static bool IsValid(int[] groups, int groupId, int groupAmount)
+    {
+        return groupId == groups.Length || groupId == groups.Length - 1 && groupAmount == groups[groupId];
+    }
+
+    // Sadly, my own implementation didn't work for part two. :(
+    // Use the above implementation for the correct awser.
+    // My implementation did work for part one and the examples given by AdventOfCode.
+    internal static long FindAmountOfDifferentArrangements(string springs, int[] groups)
     {
         int springsCount = springs.Length;
         int minimumSpringsNeeded = groups.Sum() + groups.Length - 1;
 
         if (springsCount == minimumSpringsNeeded)
         {
-            newSprings = new(springs);
             return 1;
         }
 
         var damagedSpringsCount = springs.Count(x => x == '#');
         if (damagedSpringsCount == groups.Sum())
         {
-            newSprings = springs.Replace('?', '.');
             return 1;
         }
 
@@ -80,12 +115,11 @@ internal class Day12_HotSprings
 
             solvedSpring = solvedSpring || solver.TrySolveLeftToRight();
             solvedSpring = solvedSpring || solver.TrySolveRightToLeft();
-            
+
             solver.TrySolveLargestGroups();
 
         } while (solvedSpring);
 
-        newSprings = springs = solver.GetSprings();
         groups = solver.GetGroups();
 
         damagedSpringsCount = springs.Count(x => x == '#');
@@ -164,7 +198,7 @@ internal class Day12_HotSprings
     public class SpringSolver(string springs, int[] groups)
     {
         private readonly char[] _springs = springs.ToCharArray();
-        private readonly List<int> _groups = [..groups];
+        private readonly List<int> _groups = [.. groups];
         private int _start = 0;
         private int _end = springs.Length - 1;
 
@@ -182,8 +216,8 @@ internal class Day12_HotSprings
 
                 foreach (var g in damagedGroupsWithLengthX)
                 {
-                    RangeSet(_springs, g.Start-1, g.Start-1, '.');
-                    RangeSet(_springs, g.End+1, g.End+1, '.');
+                    RangeSet(_springs, g.Start - 1, g.Start - 1, '.');
+                    RangeSet(_springs, g.End + 1, g.End + 1, '.');
                 }
 
                 if (damagedGroupsWithLengthX.Count != gl.Count)
@@ -193,7 +227,7 @@ internal class Day12_HotSprings
 
         public bool TrySolveLeftToRight()
         {
-            char[] startSprings = [.._springs];
+            char[] startSprings = [.. _springs];
 
             int start = _start;
             for (int gi = 0; gi < _groups.Count; gi++)
@@ -201,7 +235,7 @@ internal class Day12_HotSprings
                 var group = _groups[gi];
                 var springIndex = Array.IndexOf(_springs, '#', start);
 
-                if (springIndex == -1 || springIndex-start > group) 
+                if (springIndex == -1 || springIndex - start > group)
                 {
                     break;
                 }
@@ -251,7 +285,7 @@ internal class Day12_HotSprings
                 {
                     break;
                 }
-                
+
                 _springs[springIndex - group] = '.';
                 start = springIndex - group;
             }
@@ -292,7 +326,7 @@ internal class Day12_HotSprings
         private static int RangeSet(char[] spring, int start, int end, char value)
         {
             start = int.Max(start, 0);
-            end = int.Min(end, spring.Length-1);
+            end = int.Min(end, spring.Length - 1);
 
             for (int i = start; i <= end; i++)
                 spring[i] = value;
@@ -304,6 +338,6 @@ internal class Day12_HotSprings
             return new string(_springs, _start, Length);
         }
 
-        public int[] GetGroups() => [.._groups];
+        public int[] GetGroups() => [.. _groups];
     }
 }
