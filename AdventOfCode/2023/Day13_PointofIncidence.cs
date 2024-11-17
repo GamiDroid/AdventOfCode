@@ -51,20 +51,39 @@ internal class Day13_PointofIncidence
         Console.WriteLine($"Sum is {sum}");
     }
 
-    private static int FindVerticalReflection(char[][] pattern)
+    [Part(2)]
+    public void Part02()
     {
-        for (int col1 = 0; col1 < pattern[0].Length; col1++)
+        var sum = 0;
+        foreach (var pattern in _patterns)
         {
-            for (int col2 = col1 + 1;  col2 < pattern[0].Length; col2++)
+            var horizontalMirror = FindHorizontalReflection(pattern, ignoreSmudge: true);
+            sum += horizontalMirror * 100;
+            var verticalMirror = FindVerticalReflection(pattern, ignoreSmudge: true);
+            sum += verticalMirror;
+        }
+
+        Console.WriteLine($"Sum is {sum}");
+    }
+
+    private static int FindVerticalReflection(char[][] pattern, bool ignoreSmudge = false)
+    {
+        var colCount = pattern[0].Length;
+        for (int col1 = 0; col1 < colCount; col1++)
+        {
+            for (int col2 = col1 + 1;  col2 < colCount; col2++)
             {
-                if (ColumnEqual(pattern, col1, col2))
+                bool useIgnoreSmudge = ignoreSmudge && ((col1 == 0 && col2 == 1) || (col1 == colCount-2 && col2 == colCount-1));
+
+                if (ColumnEqual(pattern, col1, col2, ignoreSmudge: useIgnoreSmudge, out _) >= pattern.Length - (useIgnoreSmudge ? 1 : 0))
                 {
                     var distance = col2 - col1;
                     var distanceToMirror = distance / 2;
 
-                    if (IsMirroredVertically(pattern, col1 + distanceToMirror, col2 - distanceToMirror))
+                    if (IsMirroredVertically(pattern, col1 + distanceToMirror, col2 - distanceToMirror, ignoreSmudge, out bool hasSmudge))
                     {
-                        return col1 + distanceToMirror + 1;
+                        if (!ignoreSmudge || hasSmudge)
+                            return col1 + distanceToMirror + 1;
                     }
                 }
             }
@@ -73,20 +92,26 @@ internal class Day13_PointofIncidence
         return 0;
     }
 
-    private static int FindHorizontalReflection(char[][] pattern)
+    private static int FindHorizontalReflection(char[][] pattern, bool ignoreSmudge = false)
     {
-        for (int row1 = 0; row1 < pattern.Length; row1++)
+        int rowCount = pattern.Length;
+
+        for (int row1 = 0; row1 < rowCount; row1++)
         {
-            for (int row2 = row1 + 1; row2 < pattern.Length; row2++)
+            for (int row2 = row1 + 1; row2 < rowCount; row2++)
             {
-                if (RowEqual(pattern, row1, row2))
+                bool useIgnoreSmudge = ignoreSmudge && ((row1 == 0 && row2 == 1) || (row1 == rowCount - 2 && row2 == rowCount - 1));
+
+                int colCount = pattern[0].Length;
+                if (RowEqual(pattern, row1, row2, ignoreSmudge: useIgnoreSmudge, out _) >= colCount - (useIgnoreSmudge ? 1 : 0))
                 {
                     var distance = row2 - row1;
                     var distanceToMirror = distance / 2;
 
-                    if (IsMirroredHorizontally(pattern, row1 + distanceToMirror, row2 - distanceToMirror))
+                    if (IsMirroredHorizontally(pattern, row1 + distanceToMirror, row2 - distanceToMirror, ignoreSmudge, out bool hasSmudge))
                     {
-                        return row1 + distanceToMirror + 1;
+                        if (!ignoreSmudge || hasSmudge)
+                            return row1 + distanceToMirror + 1;                            
                     }
                 }
             }
@@ -95,30 +120,55 @@ internal class Day13_PointofIncidence
         return 0;
     }
 
-    private static bool IsMirroredVertically(char[][] pattern, int col1, int col2)
+    private static bool IsMirroredVertically(char[][] pattern, int col1, int col2, bool ignoreSmudge, out bool hasSmudge)
     {
+        int ignoresAllowed = ignoreSmudge ? 1 : 0;
+        hasSmudge = false;
+
         do
         {
-            if (!ColumnEqual(pattern, col1, col2))
+            int equalColumnCount = ColumnEqual(pattern, col1, col2, ignoreSmudge, out int smudgeRow);
+            int missingCount = (pattern.Length - equalColumnCount);
+
+            if (missingCount > 0)
+            {
+                hasSmudge = true;
+            }
+
+            if (missingCount > ignoresAllowed)
             {
                 return false;
             }
+
+            ignoresAllowed -= missingCount;
             col1--;
             col2++;
         }
-        while (col1 >= 0 && col2 < pattern[0].Length); 
+        while (col1 >= 0 && col2 < pattern[0].Length);
 
         return true;
     }
 
-    private static bool IsMirroredHorizontally(char[][] pattern, int row1, int row2)
+    private static bool IsMirroredHorizontally(char[][] pattern, int row1, int row2, bool ignoreSmudge, out bool hasSmudge)
     {
+        int ignoresAllowed = ignoreSmudge ? 1 : 0;
+        hasSmudge = false;
         do
         {
-            if (!RowEqual(pattern, row1, row2))
+            int equalRowCount = RowEqual(pattern, row1, row2, ignoreSmudge, out int smudgeCol);
+            int missingCount = (pattern[0].Length - equalRowCount);
+
+            if (missingCount > 0)
+            {
+                hasSmudge = true;
+            }
+
+            if (missingCount > ignoresAllowed)
             {
                 return false;
             }
+
+            ignoresAllowed -= missingCount;
             row1--;
             row2++;
         }
@@ -127,20 +177,45 @@ internal class Day13_PointofIncidence
         return true;
     }
 
-    private static bool RowEqual(char[][] pattern, int row1, int row2)
+    private static int RowEqual(char[][] pattern, int row1, int row2, bool ignoreSmudge, out int smudge)
     {
-        return pattern[row1].SequenceEqual(pattern[row2]);
+        int ignoresAllowed = ignoreSmudge ? 1 : 0;
+        int ignores = 0;
+        smudge = -1;
+
+        for (int col = 0; col < pattern[0].Length; col++)
+        {
+            var c1 = pattern[row1][col];
+            var c2 = pattern[row2][col];
+            if (c1 != c2)
+            {
+                if (ignoresAllowed == ignores)
+                    return col - ignores;
+                ignores++;
+                smudge = col;
+            }
+        }
+        return pattern[0].Length - ignores;
     }
 
-    private static bool ColumnEqual(char[][] pattern, int column1, int column2)
+    private static int ColumnEqual(char[][] pattern, int column1, int column2, bool ignoreSmudge, out int smudge)
     {
+        int ignoresAllowed = ignoreSmudge ? 1 : 0;
+        int ignores = 0;
+        smudge = -1;
+
         for (int row = 0; row < pattern.Length; row++)
         {
             var c1 = pattern[row][column1];
             var c2 = pattern[row][column2];
             if (c1 != c2)
-                return false;
+            {
+                if (ignoresAllowed == ignores)
+                    return row - ignores;
+                ignores++;
+                smudge = row;
+            }
         }
-        return true;
+        return pattern.Length - ignores;
     }
 }
