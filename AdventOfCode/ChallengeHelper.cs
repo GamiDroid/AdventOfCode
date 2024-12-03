@@ -36,7 +36,7 @@ internal class ChallengeHelper
 
     private static string GetChallengeResourceFilePath(string challengeFilePath)
     {
-        var challengeName = Path.GetFileNameWithoutExtension(challengeFilePath)?.Split("_")[1];
+        var challengeName = Path.GetFileNameWithoutExtension(challengeFilePath);
         var filePath = Path.Combine(challengeFilePath, "..", "Resources", $"{challengeName}.txt");
 
         if (!File.Exists(filePath))
