@@ -42,17 +42,21 @@ internal class Day02_RedNosedReports
                 counter++;
             else
             {
-                for (int i = 0; i < report.Length; i++)
-                {
-                    var tempList = report.ToList();
-                    tempList.RemoveAt(i);
+                var tempList = report.ToList();
+                tempList.RemoveAt(failureIndex);
 
-                    if (IsValidReport([.. tempList], out _))
+                if (!IsValidReport([.. tempList], out _))
+                {
+                    tempList = [.. report];
+                    tempList.RemoveAt(failureIndex + 1);
+
+                    if (!IsValidReport([.. tempList], out _))
                     {
-                        counter++;
-                        break;
+                        continue;
                     }
                 }
+
+                counter++;
             }
         }
 
@@ -61,16 +65,7 @@ internal class Day02_RedNosedReports
 
     private static bool IsValidReport(int[] report, out int failureIndex)
     {
-        bool isDescending;
-        int countDescending = 0;
-        for (int i1 = 0; i1 < report.Length - 1; i1++)
-        {
-            int diff = report[i1 + 1] - report[i1];
-            if (diff < 0) countDescending++;
-        }
-
-        isDescending = (report.Length - countDescending) < (report.Length / 2);
-
+        bool isDescending = IsDescending(report);
         failureIndex = -1;
         for (int i = 0; i < report.Length-1; i++)
         {
@@ -97,51 +92,15 @@ internal class Day02_RedNosedReports
         return true;
     }
 
-    //private static bool IsValidReportWithTolerance(int[] report)
-    //{
-    //    bool isDescending;
-    //    int countDescending = 0;
+    static bool IsDescending(int[] report)
+    {
+        int countDescending = 0;
+        for (int i = 0; i < report.Length - 1; i++)
+        {
+            int diff = report[i + 1] - report[i];
+            if (diff < 0) countDescending++;
+        }
 
-    //    for (int i1 = 0; i1 < report.Length-1; i1++)
-    //    {
-    //        int diff = report[i1 + 1] - report[i1];
-    //        if (diff < 0) countDescending++;
-    //    }
-
-    //    isDescending = (report.Length - countDescending) < (report.Length / 2);
-
-    //    int i;
-    //    for (i = 0; i < report.Length-1; i++)
-    //    {
-    //        var diff = report[i+1] - report[i];
-    //        if (Math.Abs(diff) < 1 || Math.Abs(diff) > 3)
-    //        {
-    //            break;
-    //        }
-
-    //        if (isDescending && diff > 0)
-    //            break;
-    //        else if (!isDescending && diff < 0)
-    //            break;
-    //    }
-
-    //    if (i < report.Length - 1)
-    //    {
-    //        var list1 = report.ToList();
-    //        list1.RemoveAt(i);
-    //        var arr1 = list1.ToArray();
-
-    //        if (IsValidReport(arr1))
-    //            return true;
-
-    //        list1 = [.. report];
-    //        list1.RemoveAt(i + 1);
-    //        arr1 = [.. list1];
-
-    //        if (IsValidReport(arr1))
-    //            return true;
-    //    }
-
-    //    return (i == report.Length - 1);
-    //}
+        return countDescending > report.Length / 2;
+    }
 }
