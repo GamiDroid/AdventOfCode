@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode;
+﻿using Microsoft.VisualBasic;
+
+namespace AdventOfCode;
 internal class Map<T> where T : struct
 {
     private readonly T[,] _map;
@@ -12,16 +14,27 @@ internal class Map<T> where T : struct
         _lengthY = _map.GetLength(1);
     }
 
-    //public Map(T[][] map)
-    //{
-    //    var tempMap = new();
-    //}
+    public Map(T[][] map)
+    {
+        _map = new T[map[0].Length, map.Length];
+        for (int y = 0; y < map.Length; y++)
+        {
+            for (int x = 0; x < map[y].Length; x++)
+            {
+                _map[x, y] = map[y][x];
+            }
+        }
+        _lengthX = _map.GetLength(0);
+        _lengthY = _map.GetLength(1);
+    }
 
     public int LengthX => _lengthX;
     public int LengthY => _lengthY;
+    public int MaxX => _lengthX-1;
+    public int MaxY => _lengthY-1;
 
-    public T this[int x, int y] => _map[x, y];
-    public T this[Location location] => _map[location.X, location.Y];
+    public T this[int x, int y] { get => _map[x, y]; set => _map[x, y] = value; }
+    public T this[Location location] { get => _map[location.X, location.Y]; set => _map[location.X, location.Y] = value; }
 
     private bool IsValidLocation(int x, int y)
     {
