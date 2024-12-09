@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
+﻿
 namespace AdventOfCode;
 internal class Map<T> where T : struct
 {
@@ -66,4 +65,29 @@ internal static class Map
 
         return new Map<char>(map);
     }
+
+    public static IEnumerable<MapLocation<T>> Enumerate<T>(this Map<T> map) where T : struct
+    {
+        for (var x = 0; x < map.LengthX; x++)
+        {
+            for (var y = 0; y < map.LengthY; y++)
+            {
+                var location = new Location(x, y);
+                yield return new MapLocation<T>(map[location], location);
+            }
+        }
+    }
+
+    public static IEnumerable<T> EnumerateValues<T>(this Map<T> map) where T : struct
+    {
+        for (var x = 0; x < map.LengthX; x++)
+        {
+            for (var y = 0; y < map.LengthY; y++)
+            {
+                yield return map[x, y];
+            }
+        }
+    }
 }
+
+internal record struct MapLocation<T>(T Value, Location Location) where T : struct;
