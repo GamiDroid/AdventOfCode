@@ -3,12 +3,12 @@
 [Challenge(2023, 16, "The Floor Will Be Lava")]
 internal class Day16_TheFloorWillBeLava
 {
-    private readonly Map _map;
+    private readonly Map<char> _map;
 
     public Day16_TheFloorWillBeLava()
     {
         var lines = ChallengeHelper.ReadAllLinesFromResourceFile();
-        _map = new Map(lines);
+        _map = Map.Create(lines);
     }
 
     [Part(1)]

@@ -1,8 +1,4 @@
-﻿
-using System.ComponentModel;
-using static AdventOfCode._2015.Day09_AllInASingleNight;
-
-namespace AdventOfCode._2024;
+﻿namespace AdventOfCode._2024;
 [Challenge(2024, 12, "Garden Groups")]
 internal class Day12_GardenGroups
 {
@@ -71,7 +67,7 @@ internal class Day12_GardenGroups
                 }
                 totalSides += sides;
             }
-            
+
             var allHorizontalY = fences.Select(y => new { y.Location.Y, y.Direction }).Where(x => x.Direction is 0 or 2).DistinctBy(y => new { y.Y, y.Direction }).ToList();
             foreach (var h in allHorizontalY)
             {
@@ -105,7 +101,7 @@ internal class Day12_GardenGroups
             for (int d = 0; d < 4; d++)
             {
                 var nextLocation = GetNewLocation(location, d);
-                if (!_map.IsValidLocation(nextLocation) || 
+                if (!_map.IsValidLocation(nextLocation) ||
                     !locations.Contains(nextLocation))
                 {
                     fenceCount++;
@@ -150,7 +146,7 @@ internal class Day12_GardenGroups
         {
             var nextLocation = GetNewLocation(location, d);
 
-            if (!_map.IsValidLocation(nextLocation) || 
+            if (!_map.IsValidLocation(nextLocation) ||
                 visited.Contains(nextLocation))
             {
                 continue;
@@ -158,7 +154,7 @@ internal class Day12_GardenGroups
 
             var nextValue = _map[nextLocation];
             if (nextValue != value)
-            { 
+            {
                 continue;
             }
 
