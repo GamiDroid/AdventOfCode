@@ -27,6 +27,18 @@ internal class Map<T> where T : struct
         _lengthY = _map.GetLength(1);
     }
 
+    public Map(int lengthX, int lengthY, T value) 
+        : this(new T[lengthX, lengthY])
+    {
+        for (int x = 0; x < _lengthX; x++)
+        {
+            for (int y = 0; y < _lengthY; y++)
+            {
+                _map[x, y] = value;
+            }
+        }
+    }
+
     public int LengthX => _lengthX;
     public int LengthY => _lengthY;
     public int MaxX => _lengthX-1;
