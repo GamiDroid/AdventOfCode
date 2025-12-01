@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 
 namespace AdventOfCode.ConsoleApp;
 internal static class AdventOfCodeRunner
@@ -104,15 +105,21 @@ internal static class AdventOfCodeRunner
         if (!partMethods.Any())
             Console.WriteLine("There are no Advent of Code parts found to execute.");
 
-        Console.WriteLine($"Executing parts for {type.Name}:");
+        Console.WriteLine($"Solving puzzles for {type.Name}:");
 
         foreach (var part in partMethods)
         {
             var instance = Activator.CreateInstance(type);
 
             Console.WriteLine($"Executing part {part.PartAttribute.Number} '{part.MethodInfo.Name}'...\n");
-
+    
+            var sp = Stopwatch.StartNew();
+    
             var result = part.MethodInfo.Invoke(instance, null);
+
+            sp.Stop();
+            
+            Console.WriteLine($"Part {part.PartAttribute.Number} '{part.MethodInfo.Name}' executed in {sp.ElapsedMilliseconds} ms.");
 
             if (result is not null)
                 Console.WriteLine($"Puzzle result: {result}");
