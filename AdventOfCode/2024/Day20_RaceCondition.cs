@@ -16,7 +16,7 @@ internal class Day20_RaceCondition
         var start = FindFirstLocation('S');
         var end = FindFirstLocation('E');
 
-        int steps = SolveMaze();
+        int steps = SolveMaze(start, end);
 
         Console.WriteLine($"Part 1: {steps}");
     }

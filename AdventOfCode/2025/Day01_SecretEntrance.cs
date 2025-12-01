@@ -17,7 +17,7 @@ internal class Day01_SecretEntrance
     }
 
     [Part(1)]
-    public void Part01()
+    public void Part1()
     {
         var codeLock = new CodeLock(50);
 
@@ -38,6 +38,28 @@ internal class Day01_SecretEntrance
         Console.WriteLine($"Lock was {counter} times on zero.");
     }
 
+    [Part(2)]
+    public void Part2()
+    {
+        var codeLock = new CodeLock(50);
+
+        var counter = 0;
+        foreach (var (direction, ticks) in _commands)
+        {
+            var timesZero = (direction) switch
+            {
+                "L" => codeLock.ForceRotate(-ticks),
+                "R" => codeLock.ForceRotate(ticks),
+                _ => throw new InvalidOperationException(),
+            };
+
+            counter += timesZero;
+        }
+
+        // 5937
+        Console.WriteLine($"Lock was {counter} times on zero.");
+    }
+
     public class CodeLock(int value)
     {
         private int _value = value;
@@ -55,6 +77,53 @@ internal class Day01_SecretEntrance
                 _value %= 100;
 
             return _value;
+        }
+
+        public int Rotate(int changes)
+        {
+            int timesZero = Math.Abs(changes / 100);
+
+            changes %= 100;
+
+            _value += changes;
+
+            if (_value < 0)
+            {
+                _value += 100;
+                timesZero++;
+            }
+
+            if (_value > 99)
+            {
+                _value %= 100;
+                timesZero++;
+            }
+
+            return timesZero;
+        }
+
+        public int ForceRotate(int changes)
+        {
+            int timesZero = 0;
+
+            for (int i = 0; i < Math.Abs(changes); i++)
+            {
+                if (changes > 0)
+                    _value++;
+                else
+                    _value--;
+
+                if (_value == 100)
+                    _value = 0;
+
+                if (_value < 0)
+                    _value = 99;
+
+                if (_value == 0)
+                    timesZero++;
+            }
+
+            return timesZero;
         }
     }
 }
