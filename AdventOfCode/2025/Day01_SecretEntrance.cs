@@ -42,6 +42,7 @@ internal class Day01_SecretEntrance
     public void Part2()
     {
         var codeLock = new CodeLock(50);
+        var codeLock2 = new CodeLock(50);
 
         var counter = 0;
         foreach (var (direction, ticks) in _commands)
@@ -53,6 +54,19 @@ internal class Day01_SecretEntrance
                 _ => throw new InvalidOperationException(),
             };
 
+            var timesZero2 = (direction) switch
+            {
+                "L" => codeLock2.Rotate(-ticks),
+                "R" => codeLock2.Rotate(ticks),
+                _ => throw new InvalidOperationException(),
+            };
+
+            if (timesZero != timesZero2 ||
+                codeLock.Value != codeLock2.Value)
+            {
+                Console.WriteLine("DBG: Value differ");
+            }
+
             counter += timesZero;
         }
 
@@ -63,6 +77,8 @@ internal class Day01_SecretEntrance
     public class CodeLock(int value)
     {
         private int _value = value;
+
+        public int Value => _value;
 
         public int Update(int changes)
         {
@@ -85,15 +101,19 @@ internal class Day01_SecretEntrance
 
             changes %= 100;
 
+            int prev = _value;
+
             _value += changes;
 
             if (_value < 0)
             {
                 _value += 100;
-                timesZero++;
+
+                if (prev != 0)
+                    timesZero++;
             }
 
-            if (_value > 99)
+            if (_value > 99 || _value == 0)
             {
                 _value %= 100;
                 timesZero++;
