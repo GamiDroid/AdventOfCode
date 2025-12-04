@@ -78,11 +78,18 @@ internal static class Map
         return new Map<char>(map);
     }
 
+    /// <summary>
+    /// Enumerates all locations in the map, yielding each value along with its corresponding coordinates.
+    /// </summary>
+    /// <remarks>
+    /// Enumeration proceeds in row-major order, starting from the top-left corner (0, 0) and
+    /// advancing by rows. The returned sequence includes every location within the bounds of the map.
+    /// </remarks>
     public static IEnumerable<MapLocation<T>> Enumerate<T>(this Map<T> map) where T : struct
     {
-        for (var x = 0; x < map.LengthX; x++)
+        for (var y = 0; y < map.LengthY; y++)
         {
-            for (var y = 0; y < map.LengthY; y++)
+            for (var x = 0; x < map.LengthX; x++)
             {
                 var location = new Location(x, y);
                 yield return new MapLocation<T>(map[location], location);
