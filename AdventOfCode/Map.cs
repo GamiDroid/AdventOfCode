@@ -27,6 +27,21 @@ internal class Map<T> where T : struct
         _lengthY = _map.GetLength(1);
     }
 
+    public Map(Map<T> other)
+    {
+        _map = new T[other.LengthX, other.LengthY];
+        _lengthX = other.LengthX;
+        _lengthY = other.LengthY;
+
+        for (int y = 0; y < _lengthY; y++)
+        {
+            for (int x = 0; x < _lengthX; x++)
+            {
+                _map[x, y] = other[x, y];
+            }
+        }
+    }
+
     public Map(int lengthX, int lengthY, T value) 
         : this(new T[lengthX, lengthY])
     {
