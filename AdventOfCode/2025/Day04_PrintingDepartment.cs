@@ -32,6 +32,44 @@ internal class Day04_PrintingDepartment
         Console.WriteLine($"Accessable rolls: {count}");
     }
 
+    [Part(2)]
+    public void Part2()
+    {
+        var map = new Map<char>(_map);
+
+        int count = 0;
+
+        int rollsRemoved;
+        do
+        {
+            List<Location> rollLocationsToRemove = [];
+            foreach (var mapLoc in map.Enumerate())
+            {
+                if (mapLoc.Value != '@')
+                {
+                    continue;
+                }
+
+                var countAdjancent = CountAdjacentRolls(map, mapLoc.Location);
+                if (countAdjancent < 4)
+                {
+                    count++;
+                    rollLocationsToRemove.Add(mapLoc.Location);
+                }
+            }
+
+            foreach (var loc in rollLocationsToRemove)
+            {
+                map[loc] = 'x';
+            }
+
+            rollsRemoved = rollLocationsToRemove.Count;
+        }
+        while (rollsRemoved > 0);
+
+        Console.WriteLine($"Accessable rolls: {count}");
+    }
+
     private static readonly Func<Location, Location>[] s_moves = [
         (Location c) => c.Move(-1, -1),
         (Location c) => c.Move(-1, 0),
